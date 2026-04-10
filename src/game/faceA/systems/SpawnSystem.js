@@ -1,0 +1,1 @@
+// spawn de enemigos, escalado de dificultad, movimiento básico, vida/estado enemigos

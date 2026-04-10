@@ -1,0 +1,1 @@
+// grid de lógica para el mundo

@@ -1,0 +1,1 @@
+// sistema de coordenadas isométricas (hace de cámara)

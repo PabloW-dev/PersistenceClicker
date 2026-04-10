@@ -1,0 +1,1 @@
+// contador global, añade tiempo, restar tiempo

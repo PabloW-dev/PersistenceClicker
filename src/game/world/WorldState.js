@@ -1,0 +1,1 @@
+// estado del mapa en la partida
