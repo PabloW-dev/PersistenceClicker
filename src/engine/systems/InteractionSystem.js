@@ -1,13 +1,21 @@
 // detector de clicks
-import { plusTime } from "../../utils/events";
+import worldState from "../../game/world/WorldState";
+import { plusTime } from "../../game/faceA/LogicA.js";
+import { plusExp } from "../../game/shared/Exp";
 
-function handleClick(pos) {
-    // luego:
-    // añadir que recibe un pos
-    // - hit detection (collider system)
-    // - detectar si es torre, enemigo, UI, etc
-    console.log(pos);
-    plusTime(); // de momento
+import { getEntityAtPosition } from "./ColliderSystem.js";
+
+function interactionSystem(worldPos) {
+    const entity = getEntityAtPosition(worldPos, worldState.structures);
+
+    if(!entity) return;
+
+    console.log("clicked entity:", entity.id);
+
+    if(entity.type === "tower") {
+        plusExp(0.1);
+        plusTime(worldPos);
+    }
 }
 
-export default handleClick;
+export default interactionSystem;

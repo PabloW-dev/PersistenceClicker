@@ -2,6 +2,7 @@
 // root component that wraps the React application
 import React from "react";
 import PanelFaceA from "./ui/components/PanelFaceA";
+import HUD from "./ui/components/HUD";
 
 export default function App() {
     
@@ -10,7 +11,7 @@ export default function App() {
         <>
             <h1>PersistenceClicker</h1>
             <h2>Time cannot be beaten... Only delayed...</h2>
-
+            <HUD />
             <PanelFaceA />
         </>
 )};

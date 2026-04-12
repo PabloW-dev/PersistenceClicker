@@ -1,0 +1,27 @@
+.game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+}
+
+
+.floating-text {
+    position: absolute;
+    pointer-events: none;
+    font-size: 18px;
+    color: white;
+
+    animation: floatUp 1.5s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -120%);
+    }
+}
