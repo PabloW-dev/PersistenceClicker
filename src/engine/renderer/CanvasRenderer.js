@@ -38,10 +38,10 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                 y: structure.y
             });
 
-            if(structure.sprite.type === "tower") {
+            if (structure.sprite) {
                 const img = AssetsManager.getImage(structure.sprite.type);
 
-                if(!img || !img.complete) return;
+                if (!img || !img.complete) return;
 
                 const width = 128;
                 const height = 128;
@@ -65,10 +65,43 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                 y: entity.y
             });
 
-            ctx.fillStyle = "red";
-            ctx.beginPath();
-            ctx.arc(screenPos.x, screenPos.y, 10, 0, Math.PI * 2);
-            ctx.fill();
+            
+            if (entity.sprite) {
+                const img = AssetsManager.getImage(entity.sprite.type);
+
+                if (img && img.complete) {
+                    let width = 64;
+                    let height = 64;
+
+                    if (entity.type === "enemy") {
+                        width = 32;
+                        height = 32;
+
+                        if (entity.data.hitFlash > 0) {
+                            ctx.globalAlpha = 0.5;
+                        }
+                    }
+
+                    const anchor = entity.sprite.anchor || { x: 0.5, y: 0.5 };
+
+                    ctx.drawImage(
+                        img,
+                        screenPos.x - width * anchor.x,
+                        screenPos.y - height * anchor.y,
+                        width,
+                        height
+                    );
+
+                    ctx.globalAlpha = 1;
+                }
+
+            } else {
+                // fallback (debug)
+                ctx.fillStyle = "red";
+                ctx.beginPath();
+                ctx.arc(screenPos.x, screenPos.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
         });
     }
 }

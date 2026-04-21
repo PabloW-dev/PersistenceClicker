@@ -3,7 +3,10 @@
 import createTower from "../faceA/entities/Tower.js";
 
 const worldState = {
-    grid: {},
+    grid: {
+        WORLD_WIDTH: 2000,
+        WORLD_HEIGHT: 1600
+    },
 
     structures: [
         createTower()

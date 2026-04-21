@@ -4,6 +4,12 @@
     height: 600px;
 }
 
+.floating-layer {
+    position: absolute;
+    inset: 0; // top:0, left:0, right:0, bottom:0
+    pointer-events: none;
+}
+
 
 .floating-text {
     position: absolute;
@@ -11,7 +17,7 @@
     font-size: 18px;
     color: white;
 
-    animation: floatUp 1.5s ease-out forwards;
+    animation: floatUp 0.5s ease-out forwards;
 }
 
 @keyframes floatUp {

@@ -5,10 +5,12 @@ class AssetManager {
         this.images = {};
     }
 
-    loadImage(key, src) {
-        const img = new Image();
-        img.src = src;
-        this.images[key] = img;
+    loadAll(manifest) {
+        for (const key in manifest) {
+            const img = new Image();
+            img.src = manifest[key];
+            this.images[key] = img;
+        }
     }
 
     getImage(key) {
