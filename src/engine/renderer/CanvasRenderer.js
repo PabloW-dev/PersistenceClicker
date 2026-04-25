@@ -1,6 +1,7 @@
 // encargado de dibujar elementos en el canvas y manejar requestAnimationFrame
 // for drawing elements on the canvas and handling requestAnimationFrame
 import AssetsManager from "../../assets/AssetsManager";
+import gameStateA from "../../game/faceA/state/GameStateA.js";
 
 class CanvasRenderer { //la clase que se va a meter en GameManager para asociarla al canvas de react sin mezclar trabajo de React con trabajo de la lógica
 
@@ -25,7 +26,7 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         });
     }
 
-    render(worldState, camera) {
+    render(worldState, camera, selectedEntityId) {
         const ctx = this.ctx;
 
         //clean screen for redrawing, since 0,0 until canvas width and height
@@ -70,29 +71,41 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                 const img = AssetsManager.getImage(entity.sprite.type);
 
                 if (img && img.complete) {
-                    let width = 64;
-                    let height = 64;
+                    const anchor = entity.sprite.anchor || { x: 0.5, y: 0.5 };
+                    const width = entity.sprite.size?.w || 32;
+                    const height = entity.sprite.size?.h || 32;
 
-                    if (entity.type === "enemy") {
-                        width = 32;
-                        height = 32;
+                    // spawn animation
+                    let scale = 1;
+                    let alpha = 1;
 
-                        if (entity.data.hitFlash > 0) {
-                            ctx.globalAlpha = 0.5;
-                        }
+                    if (entity.data?.spawning) {
+                        const t = entity.data.spawnProgress;
+                        scale = 0.5 + t * 0.5;;
+                        alpha = t;
                     }
 
-                    const anchor = entity.sprite.anchor || { x: 0.5, y: 0.5 };
+                    // hit flash
+                    if (entity.data?.hitFlash > 0) {
+                        alpha *= 0.5;
+                    }
+
+                    ctx.save();
+
+                    ctx.globalAlpha = alpha;
+
+                    ctx.translate(screenPos.x, screenPos.y);
+                    ctx.scale(scale, scale);
 
                     ctx.drawImage(
                         img,
-                        screenPos.x - width * anchor.x,
-                        screenPos.y - height * anchor.y,
+                        -width * anchor.x,
+                        -height * anchor.y,
                         width,
                         height
                     );
 
-                    ctx.globalAlpha = 1;
+                    ctx.restore();
                 }
 
             } else {
@@ -103,6 +116,71 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                 ctx.fill();
             }
         });
+
+        if (gameStateA.hint.active) {
+            const screenPos = camera.worldToScreen({
+                x: gameStateA.hint.x,
+                y: gameStateA.hint.y
+            });
+
+            ctx.save();
+
+            // pulso suave
+            const pulse = 1 + Math.sin(Date.now() * 0.01) * 0.1;
+
+            ctx.translate(screenPos.x, screenPos.y);
+            ctx.scale(pulse, pulse);
+
+            // glow simple
+            ctx.fillStyle = "rgba(255, 220, 0, 0.9)";
+            ctx.beginPath();
+            ctx.arc(0, -40, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        this.renderSelection(ctx, worldState, camera, selectedEntityId);
+    }
+
+    renderSelection(ctx, worldState, camera, selectedEntityId) {
+        if (!selectedEntityId) return;
+
+        const selected = worldState.entities.find(
+            e => e.id === selectedEntityId
+        );
+
+
+        if (!selected) return;
+
+        const screenPos = camera.worldToScreen({
+            x: selected.x,
+            y: selected.y
+        });
+
+
+        const width = selected.sprite?.size?.w || 32;
+        const height = selected.sprite?.size?.h || 32;
+
+        const anchor = selected.sprite?.anchor || { x: 0.5, y: 0.5 };
+
+        ctx.save();
+
+        ctx.strokeStyle = "rgba(0, 255, 120, 0.9)";
+        ctx.lineWidth = 3;
+        ctx.shadowColor = "rgba(0, 255, 120, 0.6)";
+        ctx.shadowBlur = 10;
+
+        const padding = Math.max(2, width * 0.05);
+
+        ctx.strokeRect(
+            screenPos.x - width * anchor.x - padding,
+            screenPos.y - height * anchor.y - padding,
+            width + padding * 2,
+            height + padding * 2
+        );
+
+        ctx.restore();
     }
 }
 

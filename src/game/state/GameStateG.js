@@ -5,7 +5,10 @@ const gameState = {
     currentExp: 0,
     currentTime: 60.0,
     currentFace: "A",
-    gameStart: true
+    gameStart: true,
+    activeProcesses: [],
+    timeShakeTrigger: 0,
+    selectedEntityId: null //because I don't want a value
 };
 
 

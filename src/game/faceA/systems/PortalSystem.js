@@ -30,8 +30,8 @@ function spawnPortal() {
     const tower = worldState.structures.find(s => s.type === "tower");
 
     while (!valid && attempts < maxAttemps) {
-        x = Math.random() * worldState.grid.WORLD_WIDTH;
-        y = Math.random() * worldState.grid.WORLD_HEIGHT;
+        x = Math.random() * worldState.grid.worldWidth;
+        y = Math.random() * worldState.grid.worldHeight;
 
         const dx = x - tower.x;
         const dy = y - tower.y;

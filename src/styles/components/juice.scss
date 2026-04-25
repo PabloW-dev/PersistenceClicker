@@ -1,0 +1,21 @@
+.time {
+    display: inline-block;
+}
+
+.shake {
+    animation: shake 0.12s ease;
+}
+
+.flash {
+    color: #ff4d4d;
+    text-shadow: 0 0 6px rgba(255, 80, 80, 0.8);
+}
+
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-1px); }
+    100% { transform: translateX(0); }
+}

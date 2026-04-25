@@ -1,0 +1,24 @@
+.process-button {
+    position: relative;
+    overflow: hidden;
+    padding: 10px 16px;
+    background: #222;
+    color: white;
+    border: 1px solid #555;
+    cursor: pointer;
+}
+
+.progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: rgba(100, 200, 255, 0.35);
+    pointer-events: none;
+    transition: width 0.1s linear;
+}
+
+.process-button .label {
+    position: relative;
+    z-index: 1;
+}

@@ -2,31 +2,29 @@
 //
 
 import worldState from "../../world/WorldState";
-import { createShadowEnemy } from "../entities/Enemy";
+import { createShadowEnemy } from "../entities/Shadow";
 import { randomFrom } from "../../../utils/math";
 
 const shadowSprites = ["shadowOne", "shadowTwo", "shadowThree", "shadowFour"];
 const MAX_ENEMIES = 1000;
 
 export default function spawnSystem(deltaTime) {
-    const enemyCount = worldState.entities.filter(e => e.type === "enemy").length;
+    let enemyCount = worldState.entities.filter(e => e.type === "shadow").length;
 
-    if (enemyCount >= MAX_ENEMIES) return;
+    for (const entity of worldState.entities) {
+        if (entity.type !== "portal") continue;
 
-    worldState.entities.forEach(entity => {
-        if (entity.type !== "portal") return;
+        if (enemyCount >= MAX_ENEMIES) break;
 
-        //acumular tiempo por portal
         entity.data.spawnTimer += deltaTime;
 
-        if(entity.data.spawnTimer < entity.data.spawnCooldown) return;
+        if (entity.data.spawnTimer < entity.data.spawnCooldown) continue;
 
         entity.data.spawnTimer = 0;
 
-        if(enemyCount >= MAX_ENEMIES) return;
-
         spawnEnemyFromPortal(entity);
-    });
+        enemyCount++;
+    }
 }
 
 function spawnEnemyFromPortal(portal) {

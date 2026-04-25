@@ -4,9 +4,12 @@ import CanvasRenderer from "../renderer/CanvasRenderer.js";
 import interactionSystem from "../systems/InteractionSystem.js";
 import gameState from "../../game/state/GameStateG.js";
 import worldState from "../../game/world/WorldState.js";
+import { updateGrid } from "../../game/world/Map.js";
 import Camera from "../camera/Camera.js";
 import AssetsManager from "../../assets/AssetsManager.js";
 import assetManifest from "../../assets/AssetsManifest.js";
+import timeSystem from "../systems/TimeSystem.js";
+import movementSystem from "../systems/MovementSystem.js";
 import { initSystems, runSystems } from "../../game/faceA/systems/SystemAManager.js";
 
 
@@ -35,9 +38,15 @@ function loop(deltaTime) {
 
         const clampedDelta = Math.min(deltaTime, 0.033); // máximo ~30 FPS
 
+        timeSystem(clampedDelta);
+
         runSystems(clampedDelta, camera);
 
-        renderer.render(worldState, camera);
+        movementSystem(clampedDelta);
+
+        updateGrid(clampedDelta);
+
+        renderer.render(worldState, camera, gameState.selectedEntityId);
     }
 }
 

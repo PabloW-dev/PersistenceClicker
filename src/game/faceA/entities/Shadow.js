@@ -8,7 +8,7 @@ export function createShadowEnemy(x, y, spriteType) {
         id: crypto.randomUUID(),
         x,
         y,
-        type: "enemy",
+        type: "shadow",
 
         sprite: {
             type: spriteType,
@@ -22,12 +22,14 @@ export function createShadowEnemy(x, y, spriteType) {
         data: {
             clicks: 4,
             hp: 20,
-            speed: 30,
-            drainRadius: 40,
+            speed: 40,
+            drainRadius: 120,
             drainPerSecond: 0.5,
             drainTextCooldown: 0,
             drainAccum: 0,
-            hitFlash: 0
+            hitFlash: 0,
+            spawning: true,
+            spawnProgress: 0
         }
     });
 }

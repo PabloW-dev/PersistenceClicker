@@ -1,8 +1,10 @@
 //for all systems of A:
 
 import portalSystem, { portalLevelSystem } from "./PortalSystem";
-import enemySystem from "./EnemySystem.js";
+import shadowSystem from "./ShadowSystem.js";
 import spawnSystem from "./SpawnSystem.js";
+import spawnAnimationSystem from "./SpawnAnimationSystem.js";
+import { updateTutorialA } from "../../tutorials/tutorials.js";
 
 
 const systems = [];
@@ -11,7 +13,9 @@ export function initSystems() {
     systems.push(portalSystem);
     systems.push(portalLevelSystem);
     systems.push(spawnSystem);
-    systems.push(enemySystem);
+    systems.push(shadowSystem);
+    systems.push(spawnAnimationSystem);
+    systems.push(updateTutorialA);
 }
 
 export function runSystems(deltaTime, camera) {

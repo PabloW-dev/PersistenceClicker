@@ -6,7 +6,7 @@ function createTower() {
     return new Entity({
         id: "tower",
         x: 400,
-        y: 300, //position in the world
+        y: 300, //position in the world, not fixed for the world size yet
 
         type: "tower",
 
@@ -27,7 +27,9 @@ function createTower() {
         },
 
         data: {
-            hp: 1000
+            hp: 1000,
+            navSize: 1,
+            navOffsetY: -1
         }
     });
 }

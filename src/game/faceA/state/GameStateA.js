@@ -3,7 +3,14 @@
 
 const gameStateA = {
     portalLevel: 1,
-    portalLevelTimer: 0
+    portalLevelTimer: 0,
+    hint: {
+        active: false,
+        x: 0,
+        y: 0,
+        timer: 0,
+        dismissed: false
+    }
 }
 
 export default gameStateA;

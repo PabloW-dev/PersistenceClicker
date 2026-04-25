@@ -16,7 +16,8 @@ function createPortal(x, y) {
             anchor: {
                 x: 0.5,
                 y: 0.5
-            }
+            },
+            size: { w: 64, h: 64 }
         },
 
         collider: {
@@ -29,7 +30,9 @@ function createPortal(x, y) {
             level: gameStateA.portalLevel,
             spawnCooldown: 5,
             timer: 0,
-            spawnTimer: 0
+            spawnTimer: 0,
+            spawning: true,
+            spawnProgress: 0
         }
     });
 }
