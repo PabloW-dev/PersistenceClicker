@@ -49,7 +49,7 @@ export default function PanelFaceA() {
 
         <EmitText />
 
-        <canvas ref={canvasRef} width={800} height={600}></canvas>
+        <canvas ref={canvasRef} width={960} height={760}></canvas>
 
         <ProcessPanel archetypes={archetypes} state={state} />
     </div>

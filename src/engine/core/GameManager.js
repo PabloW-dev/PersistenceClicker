@@ -11,6 +11,7 @@ import assetManifest from "../../assets/AssetsManifest.js";
 import timeSystem from "../systems/TimeSystem.js";
 import movementSystem from "../systems/MovementSystem.js";
 import { initSystems, runSystems } from "../../game/faceA/systems/SystemAManager.js";
+import combatSystem from "../../game/faceA/systems/CombatSystem.js";
 
 
 let renderer = null;
@@ -18,16 +19,30 @@ let camera = null;
 
 function init(canvas) {
     renderer = new CanvasRenderer(canvas);
-    camera = new Camera();
+    camera = new Camera(renderer.canvas);
 
     AssetsManager.loadAll(assetManifest);
-
     initSystems();
 
-    renderer.onClick = (screenPos) => {
+    renderer.canvas.addEventListener("mouseup", (e) => {
+        if (camera.hasDragged) {
+            camera.endInteraction();
+            return;
+        }
+
+        const rect = renderer.canvas.getBoundingClientRect();
+
+        const screenPos = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+
         const worldPos = camera.screenToWorld(screenPos);
-        interactionSystem(worldPos);
-    };
+
+        interactionSystem(worldPos, camera);
+
+        camera.endInteraction();
+    });
 }
 
 function loop(deltaTime) {
@@ -44,7 +59,16 @@ function loop(deltaTime) {
 
         movementSystem(clampedDelta);
 
+        camera.clamp(
+            worldState.grid.worldWidth,
+            worldState.grid.worldHeight,
+            renderer.canvas.width,
+            renderer.canvas.height
+        );
+
         updateGrid(clampedDelta);
+
+        combatSystem(clampedDelta);
 
         renderer.render(worldState, camera, gameState.selectedEntityId);
     }

@@ -5,6 +5,7 @@ export default function EmitText() {
     const [floatingTexts, setFloatingTexts] = useState([]);
 
     useEffect(() => {
+
         const unsubscribeGain = on("timeGained", (data) => {
             const id = crypto.randomUUID();
 
@@ -44,23 +45,23 @@ export default function EmitText() {
         return () => {
             unsubscribeGain();
             unsubscribeDrain();
-        }
+        };
     }, []);
 
-  return (
-    <div className="floating-layer">
-      {floatingTexts.map(t => (
-            <p 
-                key={t.id} 
-                className="floating-text"
-                style={{
-                    left: t.x,
-                    top: t.y
-                }}
-            >
-                {t.text}
-            </p>
-        ))}
-    </div>
-  )
+    return (
+        <div className="floating-layer">
+            {floatingTexts.map(t => (
+                <p
+                    key={t.id}
+                    className="floating-text"
+                    style={{
+                        left: t.x,
+                        top: t.y
+                    }}
+                >
+                    {t.text}
+                </p>
+            ))}
+        </div>
+    );
 }

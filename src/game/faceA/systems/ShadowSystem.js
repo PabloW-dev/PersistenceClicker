@@ -33,8 +33,8 @@ export default function shadowSystem(deltaTime, camera) {
         }
 
         // HIT FLASH
-        if (entity.data.hitFlash > 0) {
-            entity.data.hitFlash -= deltaTime;
+        if (entity.data.clickHitFlash > 0) {
+            entity.data.clickHitFlash -= deltaTime;
         }
 
         // DRAIN

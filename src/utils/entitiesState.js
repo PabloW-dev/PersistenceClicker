@@ -10,6 +10,6 @@ export function canMove(entity) {
     return entity.data.state === "moving";
 }
 
-export function canTakeDamage(entity) {
-    return true; // incluso en leveling
+export function canAct(entity) {
+    return !["moving", "leveling"].includes(entity.data.state);
 }

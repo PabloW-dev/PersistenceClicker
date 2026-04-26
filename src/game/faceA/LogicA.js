@@ -6,15 +6,16 @@ import worldState from "../world/WorldState";
 import createProcess from "../../utils/process";
 import { emit } from "../../utils/events";
 import { getRandomSpawnPosition, isSpawnValid } from "../../utils/math";
+import { archetypeScaling } from "../progression/ArchetypesScaling";
 
-export function plusTime(worldPos) {
+export function plusTime(worldPos, camera) {
     if (!gameState.gameStart || gameState.currentFace !== "A") return;
 
     gameState.currentTime += 0.5;
 
     emit("timeGained", {
         value: 0.5,
-        pos: worldPos
+        pos: camera.worldToScreen(worldPos)
     });
 }
 
@@ -88,7 +89,9 @@ function spawnArchetype(archetype) {
 }
 
 function levelUpArchetype(archetype) {
-    const entity = worldState.entities.find(e => e.type === "archetype" && e.data.archetypeId === archetype.id);
+    const entity = worldState.entities.find(
+        e => e.type === "archetype" && e.data.archetypeId === archetype.id
+    );
 
     if (!entity) return;
 
@@ -96,8 +99,14 @@ function levelUpArchetype(archetype) {
 
     const lvl = entity.data.level;
 
-    entity.data.hp = 50 + lvl * 1.8 * 10;
-    entity.data.damage = 50 + lvl * 1.8 * 5;
-    entity.data.dps = 10 + lvl * 1.8 * 2;
+    const scaling = archetypeScaling[archetype.id];
+    if (!scaling) return;
+
+    entity.data.level = lvl;
+
+    for (const key in scaling) {
+        entity.data[key] = scaling[key](lvl);
+    }
+
     entity.data.state = "active";
 }

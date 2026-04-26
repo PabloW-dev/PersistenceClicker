@@ -28,6 +28,7 @@ export function createShadowEnemy(x, y, spriteType) {
             drainTextCooldown: 0,
             drainAccum: 0,
             hitFlash: 0,
+            clickHitFlash: 0,
             spawning: true,
             spawnProgress: 0
         }

@@ -86,8 +86,18 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                     }
 
                     // hit flash
-                    if (entity.data?.hitFlash > 0) {
+                    if (entity.data?.clickHitFlash > 0) {
                         alpha *= 0.5;
+                    }
+
+                    // combat hit flash (ARCHETYPES + ENEMIES + PORTALS)
+                    if (entity.data?.hitFlash > 0) {
+                        alpha *= 0.6 + Math.sin(Date.now() * 0.05) * 0.2;
+                    }
+
+                    if (entity.data?.attackFlash > 0) {
+                        alpha *= 1.15; // pequeño “pop”
+                        scale *= 1.25; // micro punch visual
                     }
 
                     ctx.save();

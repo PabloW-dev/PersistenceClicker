@@ -8,7 +8,7 @@ import gameStateA from "../../game/faceA/state/GameStateA.js";
 import gameState from "../../game/state/GameStateG.js";
 import { canBeSelected, canReceiveOrders } from "../../utils/entitiesState.js"
 
-function interactionSystem(worldPos) {
+function interactionSystem(worldPos, camera) {
 
     const selected = worldState.entities.find(
         e => e.id === gameState.selectedEntityId
@@ -20,7 +20,7 @@ function interactionSystem(worldPos) {
     if (structure) {
         if (structure.type === "tower") {
             plusExp(0.1);
-            plusTime(worldPos);
+            plusTime(worldPos, camera);
 
             gameStateA.hint.dismissed = true;
             gameStateA.hint.active = false;
@@ -46,7 +46,7 @@ function interactionSystem(worldPos) {
         if (entity.type === "shadow") {
             entity.data.clicks -= 1;
 
-            entity.data.hitFlash = Math.max(entity.data.hitFlash, 0.15);
+            entity.data.clickHitFlash = Math.max(entity.data.clickHitFlash, 0.15);
 
             if (entity.data.clicks <= 0) {
                 worldState.entities = worldState.entities.filter(e => e.id !== entity.id);

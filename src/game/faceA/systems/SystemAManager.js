@@ -5,6 +5,7 @@ import shadowSystem from "./ShadowSystem.js";
 import spawnSystem from "./SpawnSystem.js";
 import spawnAnimationSystem from "./SpawnAnimationSystem.js";
 import { updateTutorialA } from "../../tutorials/tutorials.js";
+import combatSystem from "./CombatSystem.js";
 
 
 const systems = [];
@@ -16,6 +17,7 @@ export function initSystems() {
     systems.push(shadowSystem);
     systems.push(spawnAnimationSystem);
     systems.push(updateTutorialA);
+    systems.push(combatSystem);
 }
 
 export function runSystems(deltaTime, camera) {

@@ -50,7 +50,7 @@ export function ProcessButton({ archetype, state }) {
     } else if (!hasArchetype(archetype)) {
         label = `Summon ${archetype.name}`;
     } else {
-        label = `Level Up ${archetype.name}`;
+        label = `Train ${archetype.name}`;
     }
 
     const progress = process

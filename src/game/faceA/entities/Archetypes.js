@@ -25,8 +25,13 @@ export function createTheProtagonist(x, y, spriteType) {
             hp: 50,
             speed: 20,
             damage: 50,
-            dps: 10,
-            activeSkill: "",
+            attackRange: 20,
+            visionRange: 120,
+            attackCooldown: 4,
+            attackTimer: 0,
+            combatTarget: null,
+            combatOrigin: null,
+            activeSkill: null,
             state: "idle",
 
             target: null,
@@ -34,6 +39,7 @@ export function createTheProtagonist(x, y, spriteType) {
             pathIndex: 0,
             
             hitFlash: 0,
+            attackFlash: 0,
             spawning: true,
             spawnProgress: 0
         },
