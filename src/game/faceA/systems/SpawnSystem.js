@@ -8,7 +8,7 @@ import { ARCHETYPES } from "./ArchetypeDefinition";
 import { randomFrom } from "../../../utils/math";
 
 const shadowSprites = ["shadowOne", "shadowTwo", "shadowThree", "shadowFour"];
-const MAX_ENEMIES = 1000;
+const MAX_ENEMIES = 500;
 
 let spawmCounter = 0;
 

@@ -9,7 +9,7 @@ export default function HUD() {
 
   return (
     <div>
-      <p>EXP: {state.currentExp.toFixed(1)}</p>
+      <p>EXP: {state.currentExp.toFixed(2)}</p>
     </div>
   );
 }

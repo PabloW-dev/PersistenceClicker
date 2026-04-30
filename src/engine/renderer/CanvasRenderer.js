@@ -120,6 +120,28 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                         height
                     );
 
+                    if (entity.data?.state === "investigating") {
+                        const pulse = 1 + Math.sin(Date.now() * 0.01) * 0.1;
+
+                        ctx.save();
+
+                        ctx.scale(pulse, pulse);
+
+                        // glow circular
+                        const radius = Math.max(width, height) * 0.7;
+
+                        ctx.globalCompositeOperation = "lighter";
+                        ctx.shadowColor = "rgba(100, 200, 255, 0.8)";
+                        ctx.shadowBlur = 25;
+
+                        ctx.beginPath();
+                        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                        ctx.fillStyle = "rgba(100, 200, 255, 0.35)";
+                        ctx.fill();
+
+                        ctx.restore();
+                    }
+
                     ctx.restore();
                 }
 

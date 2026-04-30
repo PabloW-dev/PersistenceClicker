@@ -9,19 +9,21 @@ import { emit } from "../../utils/events";
 import { getRandomSpawnPosition, isSpawnValid } from "../../utils/math";
 import { archetypeScaling } from "../progression/ArchetypesScaling";
 import { ARCHETYPES } from "./systems/ArchetypeDefinition";
+import { applyUpgrade } from "../progression/applyUpgrades";
+import { upgradeLogicianState } from "../progression/UpgradeState";
 
 export function plusTime(worldPos, camera) {
     if (!gameState.gameStart || gameState.currentFace !== "A") return;
 
-    gameState.currentTime += 0.5;
+    gameState.currentTime += 0.5 * upgradeLogicianState.clickMultiplier;
 
     emit("timeGained", {
-        value: 0.5,
+        value: 0.5 * upgradeLogicianState.clickMultiplier,
         pos: camera.worldToScreen(worldPos)
     });
 }
 
-export function startProcess(type, archetype) {
+export function startProcess(type, archetype, upgrade) {
     
     let process = null;
 
@@ -55,6 +57,19 @@ export function startProcess(type, archetype) {
                 archetypeId: archetype.id
             },
             onComplete: () => levelUpArchetype(archetype)
+        });
+    }
+
+    if (type === "investigate") {
+        process = createProcess({
+            type,
+            duration: upgrade.duration,
+            payload: {
+                archetypeId: archetype.id,
+                upgradeId: upgrade.id,
+                type: "logician_upgrade"
+            },
+            onComplete: () => applyUpgrade(archetype, upgrade)
         });
     }
 

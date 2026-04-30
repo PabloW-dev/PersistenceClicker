@@ -21,7 +21,7 @@ export default function combatSystem(deltaTime) {
         }
 
         // solo combatientes
-        if (!entity.data || entity.data.damage == null) continue;
+        if (!entity.data || !entity.data.canFight) continue;
 
         // archetypes no actúan si se mueven
         if (!canAct(entity)) {

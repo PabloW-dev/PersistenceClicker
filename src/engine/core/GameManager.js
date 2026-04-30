@@ -11,6 +11,7 @@ import assetManifest from "../../assets/AssetsManifest.js";
 import timeSystem from "../systems/TimeSystem.js";
 import movementSystem from "../systems/MovementSystem.js";
 import { initSystems, runSystems } from "../../game/faceA/systems/SystemAManager.js";
+import ExpSystem from "../systems/ExpSystem.js";
 
 
 let renderer = null;
@@ -53,6 +54,7 @@ function loop(deltaTime) {
         const clampedDelta = Math.min(deltaTime, 0.033); // máximo ~30 FPS
 
         timeSystem(clampedDelta);
+        ExpSystem(clampedDelta);
 
         runSystems(clampedDelta, camera);
 

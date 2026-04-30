@@ -1,5 +1,6 @@
 //functions of general logic
 import gameState from "./state/GameStateG";
+import { upgradeLogicianState } from "./progression/UpgradeState";
 
 
 export function restTime(process) {
@@ -14,4 +15,8 @@ export function restTime(process) {
 
 export function shouldShowArchetype(a, state) {
     return true;
+}
+
+export function shouldShowUpgrade(upgrade) {
+    return !upgradeLogicianState.activeUpgrades.includes(upgrade.id);
 }

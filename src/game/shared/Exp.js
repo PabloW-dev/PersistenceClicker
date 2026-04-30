@@ -7,8 +7,6 @@ function plusExp(value) {
     if (!gameState.gameStart || gameState.currentFace !== "A") return;
 
     gameState.currentExp += value;
-
-    console.log(gameState.currentExp);
 }
 
 export {

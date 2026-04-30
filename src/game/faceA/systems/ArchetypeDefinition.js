@@ -1,6 +1,6 @@
 //definition of archetypes (in systems because is an authomatism in some way)
 
-import { createTheProtagonist } from "../entities/Archetypes";
+import { createTheProtagonist, createTheLogician } from "../entities/Archetypes";
 import { createEchoProtagonist } from "../entities/Enemies";
 
 
@@ -17,11 +17,29 @@ export const ARCHETYPES = [
 
 
         getLevelUpDuration: (level) => {
-            return Math.floor(10 * Math.pow(1.8, level - 1));
+            return Math.floor(10 * Math.pow(1.6, level - 1));
         },
 
         getCurrentResurrectionDuration: (lastResurrection) => {
-            return Math.floor(10 * Math.pow(1.8, lastResurrection - 1));
+            return Math.floor(10 * Math.pow(1.6, lastResurrection - 1));
+        }
+    },
+
+    {
+        id: "logician",
+        name: "The Logician",
+        summoningDuration: 30,
+        spriteType: "logician",
+        factory: createTheLogician,
+
+        echoFactory: null, //TO DO
+
+        getLevelUpDuration: (level) => {
+            return Math.floor(30 * Math.pow(1.6, level - 1));
+        },
+
+        getCurrentResurrectionDuration: (lastResurrection) => {
+            return Math.floor(30 * Math.pow(1.6, lastResurrection - 1));
         }
     }
 ];

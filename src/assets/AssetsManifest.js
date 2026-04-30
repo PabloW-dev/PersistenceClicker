@@ -11,6 +11,7 @@ import shadowFour from "./sprites/Sombra4.png";
 import echoProtagonist from "./sprites/EchoProtagonist.png";
 
 import protagonist from "./sprites/Protagonist.png";
+import logician from "./sprites/Logician.png"
 
 
 const assetManifest = {
@@ -24,7 +25,8 @@ const assetManifest = {
 
     echoProtagonist,
 
-    protagonist
+    protagonist,
+    logician
 };
 
 export default assetManifest;

@@ -37,7 +37,16 @@ export function ProcessButton({ archetype, state }) {
         p.payload?.archetypeId === archetype.id
     );
 
-    const process = resurrectProcess || normalProcess; //priorizing resurrect type
+    const investigateProcess = activeProcesses.find(
+        p => p.type === "investigate" &&
+        p.payload?.archetypeId === archetype.id
+    );
+
+    const process = 
+        resurrectProcess || 
+        investigateProcess || 
+        normalProcess; 
+        //priorizing resurrect type
     
 
     function handleClick() {
@@ -58,9 +67,9 @@ export function ProcessButton({ archetype, state }) {
 
     if(process) {
         console.log(process.type);
-        label = process.type === "resurrect"
-        ? "Reviving"
-        : "Add Time";
+        if (process.type === "resurrect") label = "Reviving";
+        else if (process.type === "investigate") label = "Investigating";
+        else label = "Add Time";
     } else if (!hasArchetype(archetype)) {
         label = `Summon ${archetype.name}`;
     } else {

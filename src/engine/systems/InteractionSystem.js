@@ -7,6 +7,7 @@ import { findPath } from "../../game/world/PathFinding.js";
 import gameStateA from "../../game/faceA/state/GameStateA.js";
 import gameState from "../../game/state/GameStateG.js";
 import { canBeSelected, canReceiveOrders } from "../../utils/entitiesState.js"
+import { emit } from "../../utils/events.js";
 
 function interactionSystem(worldPos, camera) {
 
@@ -39,6 +40,15 @@ function interactionSystem(worldPos, camera) {
 
             if (gameState.selectedEntityId === entity.id) return;
             gameState.selectedEntityId = entity.id;
+
+            emit("openModal", {
+                type: entity.id === "logician"
+                    ? "logician"
+                    : "archetype",
+                payload: {
+                    entityId: entity.id
+                }
+            });
 
             return;
         }
