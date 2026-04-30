@@ -105,6 +105,11 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                     ctx.globalAlpha = alpha;
 
                     ctx.translate(screenPos.x, screenPos.y);
+
+                    if (entity.data?.state === "dead") {
+                        ctx.rotate(Math.PI / 2); // 90º
+                        ctx.globalAlpha *= 0.6;
+                    }
                     ctx.scale(scale, scale);
 
                     ctx.drawImage(

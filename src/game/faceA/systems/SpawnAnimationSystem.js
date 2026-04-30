@@ -10,6 +10,10 @@ export default function spawnAnimationSystem(deltaTime) {
         if (entity.data.spawnProgress >= 1) {
             entity.data.spawnProgress = 1;
             entity.data.spawning = false;
+
+            if (entity.type === "enemy") {
+                entity.data.state = "moving_to_tower";
+            }
         }
     });
 }

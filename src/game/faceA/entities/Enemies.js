@@ -1,14 +1,13 @@
-// classes para los items del juego
-// class for the game's items
+//enemies
 
 import Entity from "../../shared/Entity";
 
-export function createTheProtagonist(x, y, spriteType) {
+export function createEchoProtagonist(x, y, spriteType) {
     return new Entity ({
-        id: "protagonist",
+        id: crypto.randomUUID(),
         x,
         y,
-        type: "archetype",
+        type: "enemy",
 
         sprite: {
             type: spriteType,
@@ -20,31 +19,38 @@ export function createTheProtagonist(x, y, spriteType) {
         },
 
         data: {
-            archetypeId: "protagonist",
+            AsocArchRel: "protagonist",
             level: 1,
             hp: 50,
-            maxHp: 50,
-            speed: 20,
-            damage: 50,
+            speed: 10,
+            damage: 10,
             attackRange: 25,
+            attackRangeOverrides: {
+                tower: 120
+            },
             visionRange: 120,
             attackCooldown: 4,
             attackTimer: 0,
             combatTarget: null,
             combatOrigin: null,
             activeSkill: null,
-            state: "idle",
+            state: "spawning",
 
             target: null,
+            lastTargetX: null,
+            lastTargetY: null,
             path: [],
             pathIndex: 0,
+            cachedTargetCell: null,
+            lastTargetRef: null,
+            cachedTargetId: null,
+            repathTimer: 0,
+
             
             hitFlash: 0,
             attackFlash: 0,
             spawning: true,
-            spawnProgress: 0,
-
-            lastResurrection: 0
+            spawnProgress: 0
         },
     });
 }

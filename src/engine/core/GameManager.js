@@ -11,7 +11,6 @@ import assetManifest from "../../assets/AssetsManifest.js";
 import timeSystem from "../systems/TimeSystem.js";
 import movementSystem from "../systems/MovementSystem.js";
 import { initSystems, runSystems } from "../../game/faceA/systems/SystemAManager.js";
-import combatSystem from "../../game/faceA/systems/CombatSystem.js";
 
 
 let renderer = null;
@@ -67,8 +66,6 @@ function loop(deltaTime) {
         );
 
         updateGrid(clampedDelta);
-
-        combatSystem(clampedDelta);
 
         renderer.render(worldState, camera, gameState.selectedEntityId);
     }

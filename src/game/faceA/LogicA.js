@@ -2,11 +2,13 @@
 // Game flow and auxiliary functions of FaceA
 
 import gameState from "../state/GameStateG";
+import gameStateA from "./state/GameStateA";
 import worldState from "../world/WorldState";
 import createProcess from "../../utils/process";
 import { emit } from "../../utils/events";
 import { getRandomSpawnPosition, isSpawnValid } from "../../utils/math";
 import { archetypeScaling } from "../progression/ArchetypesScaling";
+import { ARCHETYPES } from "./systems/ArchetypeDefinition";
 
 export function plusTime(worldPos, camera) {
     if (!gameState.gameStart || gameState.currentFace !== "A") return;
@@ -86,6 +88,10 @@ function spawnArchetype(archetype) {
     );
 
     worldState.entities.push(entity);
+
+    if (!gameStateA.hasSummonedArchetypes[archetype.id]) {
+        gameStateA.hasSummonedArchetypes[archetype.id] = true;
+    }
 }
 
 function levelUpArchetype(archetype) {
@@ -109,4 +115,34 @@ function levelUpArchetype(archetype) {
     }
 
     entity.data.state = "active";
+}
+
+export function startResurrectProcess(entity) {
+    const archetypeId = entity.data.archetypeId;
+    const archetype = ARCHETYPES.find(a => a.id === archetypeId);
+    if(!archetype) return;
+
+    const nextResurrection = entity.data.lastResurrection + 1;
+
+    const alreadyHasProcess = gameState.activeProcesses.some(
+    p => p.payload?.archetypeId === archetypeId && p.type === "resurrect"
+    );
+
+    if (alreadyHasProcess) return;
+
+    const process = createProcess({
+        type: "resurrect",
+        duration: archetype.getCurrentResurrectionDuration(nextResurrection),
+        payload: { archetypeId },
+        onComplete: () => {
+            entity.data.hp = entity.data.maxHp || 50;
+            entity.data.state = "idle";
+            entity.data.lastResurrection = nextResurrection;
+            entity.data.combatTarget = null;
+            entity.data.combatOrigin = null;
+            // limpiar flags visuales si quieres
+        }
+    });
+
+    gameState.activeProcesses.push(process);
 }

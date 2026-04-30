@@ -8,6 +8,8 @@ import shadowTwo from "./sprites/Sombra2.png";
 import shadowThree from "./sprites/Sombra3.png";
 import shadowFour from "./sprites/Sombra4.png";
 
+import echoProtagonist from "./sprites/EchoProtagonist.png";
+
 import protagonist from "./sprites/Protagonist.png";
 
 
@@ -19,6 +21,8 @@ const assetManifest = {
     shadowTwo,
     shadowThree,
     shadowFour,
+
+    echoProtagonist,
 
     protagonist
 };

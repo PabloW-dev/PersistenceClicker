@@ -7,7 +7,7 @@ import gameStateA from "../state/GameStateA.js";
 let spawnTimer = 0;
 let spawnInterval = 30;
 let timer = 0;
-const interval = 300; //every 5 min the portals have a level up
+const interval = 600; //every 10 min the portals have a level up
 
 export default function portalSystem(deltaTime) {
     spawnTimer += deltaTime;

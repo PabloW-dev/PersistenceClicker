@@ -4,12 +4,20 @@
 const gameStateA = {
     portalLevel: 1,
     portalLevelTimer: 0,
-    hint: {
+
+    //MOVE TO TUTORIAL ENTORNE
+    hint: 
+    {
         active: false,
         x: 0,
         y: 0,
         timer: 0,
         dismissed: false
+    },
+    
+    hasSummonedArchetypes: 
+    {
+
     }
 }
 

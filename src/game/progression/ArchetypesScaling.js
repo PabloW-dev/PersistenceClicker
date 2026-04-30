@@ -1,11 +1,13 @@
 export const archetypeScaling = {
     protagonist: {
         hp: lvl => 50 + lvl * 18,
+        maxHp: lvl => 50 + lvl * 18,
         damage: lvl => 50 + lvl * 10,
     },
 
     logician: {
         hp: lvl => 30 + lvl * 10,
+        maxHp: lvl => 30 + lvl * 10,
     },
 
     logistician: {

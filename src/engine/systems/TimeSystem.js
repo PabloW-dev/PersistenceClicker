@@ -4,16 +4,22 @@ import gameState from "../../game/state/GameStateG";
 
 export default function timeSystem(deltaTime) {
 
-    const finished = [];
-
     gameState.activeProcesses.forEach(process => {
+        if (process.state !== "active") {
+            return;
+        }
+
         process.progress += deltaTime;
 
         if (process.progress >= process.duration) {
+            
+            process.state = "completed";
             process.onComplete?.();
-            finished.push(process.id);
         }
     });
 
-    gameState.activeProcesses = gameState.activeProcesses.filter(p => !finished.includes(p.id));
+    //clean
+    gameState.activeProcesses = gameState.activeProcesses.filter(
+        p => p.state === "active"
+    );
 }

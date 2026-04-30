@@ -27,7 +27,18 @@ function hasArchetype(archetype) {
 export function ProcessButton({ archetype, state }) {
     const activeProcesses = state.activeProcesses;
     
-    const process = activeProcesses.find(p => p.payload?.archetypeId === archetype.id); //asociación entre el payload y el id del arquetipo en concreto
+    const resurrectProcess = activeProcesses.find(
+        p => p.type === "resurrect" &&
+        p.payload?.archetypeId === archetype.id
+    );
+
+    const normalProcess = activeProcesses.find(
+        p => p.type !== "resurrect" &&
+        p.payload?.archetypeId === archetype.id
+    );
+
+    const process = resurrectProcess || normalProcess; //priorizing resurrect type
+    
 
     function handleClick() {
         gameState.selectedEntityId = null;
@@ -46,7 +57,10 @@ export function ProcessButton({ archetype, state }) {
     let label;
 
     if(process) {
-        label = "Add Time";
+        console.log(process.type);
+        label = process.type === "resurrect"
+        ? "Reviving"
+        : "Add Time";
     } else if (!hasArchetype(archetype)) {
         label = `Summon ${archetype.name}`;
     } else {
@@ -55,6 +69,10 @@ export function ProcessButton({ archetype, state }) {
 
     const progress = process
         ? Math.min(process.progress / process.duration, 1)
+        : 0;
+
+    const remaining = process
+        ? Math.ceil(process.duration - process.progress)
         : 0;
 
     return (
@@ -68,7 +86,7 @@ export function ProcessButton({ archetype, state }) {
 
             <span className="label">
                 {label}
-                {process && ` (${Math.ceil(process.duration - process.progress)}s)`}
+                {process && `(${remaining}s)`}
             </span>
         </button>
     );

@@ -28,7 +28,7 @@ function createPortal(x, y) {
             hp: 1000 + ((gameStateA.portalLevel * 0.25) * 100),
             maxHp: 1000 + ((gameStateA.portalLevel * 0.25) * 100),
             level: gameStateA.portalLevel,
-            spawnCooldown: 5,
+            spawnCooldown: 6,
             hitFlash: 0,
             timer: 0,
             spawnTimer: 0,

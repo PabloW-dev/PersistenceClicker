@@ -1,6 +1,7 @@
 //definition of archetypes (in systems because is an authomatism in some way)
 
 import { createTheProtagonist } from "../entities/Archetypes";
+import { createEchoProtagonist } from "../entities/Enemies";
 
 
 export const ARCHETYPES = [
@@ -11,8 +12,16 @@ export const ARCHETYPES = [
         spriteType: "protagonist",
         factory: createTheProtagonist,
 
+        echoFactory: (x, y) =>
+            createEchoProtagonist(x, y, "echoProtagonist"),
+
+
         getLevelUpDuration: (level) => {
             return Math.floor(10 * Math.pow(1.8, level - 1));
+        },
+
+        getCurrentResurrectionDuration: (lastResurrection) => {
+            return Math.floor(10 * Math.pow(1.8, lastResurrection - 1));
         }
     }
 ];
