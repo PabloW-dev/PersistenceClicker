@@ -1,24 +1,22 @@
-// torre central
-// central tower
 import Entity from "../../shared/Entity.js";
 
-function createTower() {
+function createCenterTown() {
     return new Entity({
-        id: "tower",
+        id: "centerTown",
         x: 1000,
         y: 800, //position in the world
 
-        type: "tower",
+        type: "centerTown",
 
         sprite: {
-            type: "tower",
+            type: "centerTown",
             anchor: {
                 x: 0.5,
-                y: 0.75
+                y: 0.5
             },
             size: {
-                w: 128,
-                h: 128
+                w: 360,
+                h: 360
             }
         },
 
@@ -31,13 +29,10 @@ function createTower() {
         },
 
         data: {
-            hp: 1000,
             navSize: 1,
             navOffsetY: -1,
-
-            hitFlash: 0
         }
     });
 }
 
-export default createTower;
+export default createCenterTown;

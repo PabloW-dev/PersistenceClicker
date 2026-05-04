@@ -13,17 +13,18 @@ const systems = [];
 export function initSystems() {
     systems.length = 0; 
 
-    if(gameState.currentFace !== "A") return;
 
     systems.push(portalSystem);
     systems.push(portalLevelSystem);
     systems.push(spawnSystem);
     systems.push(shadowSystem);
     systems.push(spawnAnimationSystem);
-    //systems.push(updateTutorialA);
+    //TO-DO: llevar esto a FaceT: systems.push(updateTutorialA);
     systems.push(combatSystem);
 }
 
 export function runSystems(deltaTime, camera) {
+    if(gameState.currentFace !== "A") return;
+    
     systems.forEach(system => system(deltaTime, camera));
 }

@@ -89,7 +89,7 @@ function spawnArchetype(archetype) {
     let attempts = 0;
 
     do {
-        pos = getRandomSpawnPosition(tower, 180, 220);
+        pos = getRandomSpawnPosition(tower, 140, 180);
         attempts++;
     } while (
         !isSpawnValid(pos.x, pos.y, tower, 150, grid) &&

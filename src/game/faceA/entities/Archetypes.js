@@ -40,6 +40,7 @@ export function createTheProtagonist(x, y, spriteType) {
             target: null,
             path: [],
             pathIndex: 0,
+            movementType: "ground",
             
             hitFlash: 0,
             attackFlash: 0,
@@ -88,6 +89,7 @@ export function createTheLogician(x, y, spriteType) {
             target: null,
             path: [],
             pathIndex: 0,
+            movementType: "ground",
             
             hitFlash: 0,
             attackFlash: 0,

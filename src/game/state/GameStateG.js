@@ -2,9 +2,9 @@
 // global status for data shared between FaceA and FaceB
 
 const gameState = {
-    currentExp: 0,
-    currentTime: 60.0,
-    currentFace: "A",
+    currentExp: 10,
+    currentTime: 0.0,
+    currentFace: "B",
     gameStart: true,
     activeProcesses: [],
     timeShakeTrigger: 0,

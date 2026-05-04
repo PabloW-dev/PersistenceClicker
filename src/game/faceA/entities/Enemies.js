@@ -28,6 +28,7 @@ export function createEchoProtagonist(x, y, spriteType) {
             attackRangeOverrides: {
                 tower: 120
             },
+            canFight: true,
             visionRange: 120,
             attackCooldown: 4,
             attackTimer: 0,
@@ -45,6 +46,7 @@ export function createEchoProtagonist(x, y, spriteType) {
             lastTargetRef: null,
             cachedTargetId: null,
             repathTimer: 0,
+            movementType: "ground",
 
             
             hitFlash: 0,

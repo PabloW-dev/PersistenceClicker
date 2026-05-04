@@ -23,14 +23,16 @@ export function createShadowEnemy(x, y, spriteType) {
             clicks: 4,
             hp: 20,
             speed: 40,
-            drainRadius: 120,
+            drainRadius: 150,
             drainPerSecond: 0.5,
             drainTextCooldown: 0,
             drainAccum: 0,
             hitFlash: 0,
             clickHitFlash: 0,
             spawning: true,
-            spawnProgress: 0
+            spawnProgress: 0,
+
+            movementType: "ethereal",
         }
     });
 }

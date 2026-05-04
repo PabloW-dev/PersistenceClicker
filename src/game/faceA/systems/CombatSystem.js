@@ -34,19 +34,29 @@ export default function combatSystem(deltaTime) {
         entity.data.attackTimer = Math.max(0, entity.data.attackTimer - deltaTime);
 
         // limpiar target inválido o muerto
-        if (
-            entity.data.combatTarget &&
-            (
-                !entity.data.combatTarget.data ||
-                entity.data.combatTarget.data.hp <= 0 ||
-                entity.data.combatTarget.data.state === "dead"
-            )
-        ) {
-            entity.data.combatTarget = null;
-            entity.data.combatOrigin = null;
-        }
+        //if (
+        //    entity.data.combatTarget &&
+        //    (
+        //        !entity.data.combatTarget.data ||
+        //       entity.data.combatTarget.data.hp <= 0 ||
+        //        entity.data.combatTarget.data.state === "dead"
+        //    )
+        //) {
+        //   entity.data.combatTarget = null;
+        //    entity.data.combatOrigin = null;
+        //}
 
         // buscar target
+        //if (!entity.data.combatTarget) {
+        //    entity.data.combatTarget = findTarget(entity, entities, structures);
+
+        //    if (entity.data.combatTarget) {
+        //        entity.data.combatOrigin = {
+        //            x: entity.x,
+        //            y: entity.y
+        //        };
+        //    }
+        //}
         if (!entity.data.combatTarget) {
             entity.data.combatTarget = findTarget(entity, entities, structures);
 
@@ -55,6 +65,28 @@ export default function combatSystem(deltaTime) {
                     x: entity.x,
                     y: entity.y
                 };
+            }
+        } else {
+            const target = entity.data.combatTarget;
+
+            if (
+                !target.data ||
+                target.data.hp <= 0 ||
+                target.data.state === "dead"
+            ) {
+                entity.data.combatTarget = null;
+                entity.data.combatOrigin = null;
+            } else {
+                const dx = target.x - entity.x;
+                const dy = target.y - entity.y;
+                const dist = Math.hypot(dx, dy);
+
+                const loseRange = entity.data.visionRange * 1.5;
+
+                if (dist > loseRange) {
+                    entity.data.combatTarget = null;
+                    entity.data.combatOrigin = null;
+                }
             }
         }
 
@@ -152,6 +184,9 @@ export default function combatSystem(deltaTime) {
 }
 
 function findTarget(entity, entities, structures) {
+
+    //TO DO: target preferences
+    
     const isEnemy = entity.type === "enemy";
     const isArchetype = entity.type === "archetype";
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import gameState from "../game/state/GameStateG.js";
 
-export default function useGameStateA() {
+export default function useGameState() {
     const [, forceRender] = useState(0);
 
     useEffect(() => { //se ejecuta 1 vez al empezar el juego

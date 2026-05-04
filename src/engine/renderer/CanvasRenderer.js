@@ -1,11 +1,18 @@
 // encargado de dibujar elementos en el canvas y manejar requestAnimationFrame
 // for drawing elements on the canvas and handling requestAnimationFrame
 import AssetsManager from "../../assets/AssetsManager";
+import assetManifest from "../../assets/AssetsManifest.js";
 import gameStateA from "../../game/faceA/state/GameStateA.js";
+import gameState from "../../game/state/GameStateG.js";
 
 class CanvasRenderer { //la clase que se va a meter en GameManager para asociarla al canvas de react sin mezclar trabajo de React con trabajo de la lógica
 
     constructor(canvas) {
+        if (!canvas) {
+            console.warn("CanvasRenderer initialized without canvas");
+            return;
+        }
+
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
 
@@ -27,10 +34,58 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
     }
 
     render(worldState, camera, selectedEntityId) {
+        if (!this.ctx) return;
+
         const ctx = this.ctx;
 
         //clean screen for redrawing, since 0,0 until canvas width and height
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        //drawing background
+        const BackgroundPos = camera.worldToScreen({
+            x: 0,
+            y: 0
+        });
+
+        if(assetManifest.backgroundA) {
+            const backgroundImg = AssetsManager.getImage("backgroundA");
+
+            if(backgroundImg) {
+                const BGwidth = 2000;
+                const BGheight = 1600;
+
+                ctx.drawImage(
+                    backgroundImg,
+                    BackgroundPos.x,
+                    BackgroundPos.y,
+                    BGwidth,
+                    BGheight
+                );
+            };
+
+        }
+
+        if (gameState.currentFace === "B") {
+            ctx.save();
+
+            ctx.globalAlpha = 0.6;
+            ctx.fillStyle = "#50D882";
+
+            ctx.fillRect(
+                BackgroundPos.x,
+                BackgroundPos.y,
+                2000,
+                1600
+            );
+
+            ctx.restore();
+        }
+        // TODO: Fondo compartido entre Face A y Face B
+        // - Usar una única textura base del mapa (2000x1600)
+        // - Aplicar un overlay de color según la cara activa
+        //   Face A → sin overlay o tono neutro
+        //   Face B → overlay de color (ej: morado/azulado) con alpha
+        // - Esto evita duplicar assets y mantiene coherencia visual
 
         //drawing structures
         worldState.structures.forEach(structure => {
@@ -44,8 +99,8 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
                 if (!img || !img.complete) return;
 
-                const width = 128;
-                const height = 128;
+                const width = structure.sprite.size?.w || 128;
+                const height = structure.sprite.size?.h || 128;
 
                 const anchor = structure.sprite.anchor || { x: 0.5, y: 0.75 };
 

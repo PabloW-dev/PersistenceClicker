@@ -46,9 +46,9 @@ function init(canvas) {
 }
 
 function loop(deltaTime) {
-    if (!gameState.gameStart) return;
+    if (!renderer || !camera) return;
 
-    if (gameState.currentFace === "A") {
+    if (gameState.gameStart) {
         gameState.currentTime = Math.max(0, gameState.currentTime - deltaTime);
 
         const clampedDelta = Math.min(deltaTime, 0.033); // máximo ~30 FPS

@@ -35,6 +35,7 @@ function handleEchoMovement(entity, grid, deltaTime, tower) {
     const combatTarget = entity.data.combatTarget;
     const target = combatTarget || tower;
 
+
     entity.data.repathTimer = Math.max(0, entity.data.repathTimer - deltaTime);
 
     // sin objetivo
@@ -92,8 +93,8 @@ function handleEchoMovement(entity, grid, deltaTime, tower) {
 
     // SI NO HAY PATH → recalcular SIEMPRE
     const shouldRepath = 
-        entity.data.repathTimer <= 0 && 
-        (!hasPath || cellTargetChanged);
+        targetChanged ||
+        (entity.data.repathTimer <= 0 && (!hasPath || cellTargetChanged));
 
     if(shouldRepath) {
         const newPath = findPath(currentCell, safeTargetCell, grid);

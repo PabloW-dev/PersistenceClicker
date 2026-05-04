@@ -1,5 +1,6 @@
 // detector de clicks
 import worldState from "../../game/world/WorldState";
+import { upgradeLogicianState } from "../../game/progression/UpgradeState.js";
 import { plusTime } from "../../game/faceA/LogicA.js";
 import { plusExp } from "../../game/shared/Exp";
 import { getEntityAtPosition } from "./ColliderSystem.js";
@@ -20,7 +21,7 @@ function interactionSystem(worldPos, camera) {
 
     if (structure) {
         if (structure.type === "tower") {
-            plusExp(0.1);
+            plusExp(0.1 * upgradeLogicianState.clickMultiplier);
             plusTime(worldPos, camera);
 
             gameStateA.hint.dismissed = true;

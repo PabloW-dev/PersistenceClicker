@@ -2,11 +2,12 @@
 // root component that wraps the React application
 import React, { useEffect } from "react";
 import { emit } from "./utils/events";
-import PanelFaceA from "./ui/components/PanelFaceA";
-import HUD from "./ui/components/HUD";
+import GameRoot from "./ui/components/GameRoot";
 import Modals from "./ui/Modals";
+import useGameState from "./hooks/useState";
 
 export default function App() {
+    const start = useGameState();
 
     useEffect(() => {
         function handleClick(e) {
@@ -26,10 +27,15 @@ export default function App() {
 
     return(
         <>
-            <h1>PersistenceClicker</h1>
-            <h2>Time cannot be beaten... Only delayed...</h2>
-            <HUD />
-            <PanelFaceA />
+            {start.gameStart ? (
+                <GameRoot />
+            ) : (
+                <>
+                    <h1>PersistenceClicker</h1>
+                    <h2>Time cannot be beaten... Only delayed...</h2>
+                </>
+            )}
+            
             <Modals />
         </>
 )};
