@@ -14,6 +14,8 @@ class Camera {
 
         this.DRAG_THRESHOLD = 28;
 
+        this.zoom = 1.8;
+
         this.initInput(canvas);
     }
 
@@ -45,8 +47,8 @@ class Camera {
                 this.isDragging = true;
                 this.hasDragged = true;
 
-                this.x = this.cameraStart.x - dx;
-                this.y = this.cameraStart.y - dy;
+                this.x = this.cameraStart.x - dx / this.zoom;
+                this.y = this.cameraStart.y - dy / this.zoom;
             }
         });
 
@@ -67,8 +69,8 @@ class Camera {
     }
 
     clamp(worldWidth, worldHeight, canvasWidth, canvasHeight) {
-        const halfW = canvasWidth / 2;
-        const halfH = canvasHeight / 2;
+        const halfW = canvasWidth / (2 * this.zoom);
+        const halfH = canvasHeight / (2 * this.zoom);
 
         this.x = Math.max(halfW, Math.min(this.x, worldWidth - halfW));
         this.y = Math.max(halfH, Math.min(this.y, worldHeight - halfH));
@@ -76,15 +78,15 @@ class Camera {
 
     screenToWorld(pos) {
         return {
-            x: pos.x + this.x - this.canvas.width / 2,
-            y: pos.y + this.y - this.canvas.height / 2
+            x: (pos.x - this.canvas.width / 2) / this.zoom + this.x,
+            y: (pos.y - this.canvas.height / 2) / this.zoom + this.y
         };
     }
 
     worldToScreen(pos) {
         return {
-            x: pos.x - this.x + this.canvas.width / 2,
-            y: pos.y - this.y + this.canvas.height / 2
+            x: (pos.x - this.x) * this.zoom + this.canvas.width / 2,
+            y: (pos.y - this.y) * this.zoom + this.canvas.height / 2
         };
     }
 }

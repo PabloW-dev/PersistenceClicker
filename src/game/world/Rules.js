@@ -1,1 +1,0 @@
-// funciones de lógica de influencia en los mapas A y B

@@ -10,7 +10,7 @@ import gameState from "../../state/GameStateG.js";
 
 const systems = [];
 
-export function initSystems() {
+export function initSystemsA() {
     systems.length = 0; 
 
 
@@ -23,7 +23,7 @@ export function initSystems() {
     systems.push(combatSystem);
 }
 
-export function runSystems(deltaTime, camera) {
+export function runSystemsA(deltaTime, camera) {
     if(gameState.currentFace !== "A") return;
     
     systems.forEach(system => system(deltaTime, camera));

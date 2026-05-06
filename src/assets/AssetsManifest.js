@@ -22,6 +22,24 @@ import logician from "./sprites/Logician.png"
 //B
 import centerTown from "./sprites/CenterTown.png";
 
+import matureOak from "./sprites/MadureOak.png";
+import youngOak from "./sprites/YoungOak.png";
+import oldOak from "./sprites/OldOak.png";
+import deadOak from "./sprites/DeadOak.png";
+import erasedOak from "./sprites/ErasedOak.png";
+
+import maturePine from "./sprites/MadurePine.png";
+import youngPine from "./sprites/YoungPine.png";
+import oldPine from "./sprites/OldPine.png";
+import deadPine from "./sprites/DeadPine.png";
+import erasedPine from "./sprites/ErasedPine.png";
+
+import matureBirch from "./sprites/MadureBirch.png";
+import youngBirch from "./sprites/YoungBirch.png";
+import oldBirch from "./sprites/OldBirch.png";
+import deadBirch from "./sprites/DeadBirch.png";
+import erasedBirch from "./sprites/ErasedBirch.png";
+
 const assetManifest = {
     backgroundA: backgroundA,
 
@@ -38,7 +56,25 @@ const assetManifest = {
     protagonist,
     logician,
 
-    centerTown
+    centerTown,
+
+    matureOak,
+    youngOak,
+    oldOak,
+    deadOak,
+    erasedOak,
+
+    maturePine,
+    youngPine,
+    oldPine,
+    deadPine,
+    erasedPine,
+
+    matureBirch,
+    youngBirch,
+    oldBirch,
+    deadBirch,
+    erasedBirch
 };
 
 export default assetManifest;

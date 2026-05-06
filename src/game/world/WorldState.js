@@ -11,15 +11,20 @@ const WORLD_WIDTH = 2000;
 const WORLD_HEIGHT = 1600;
 
 
-
 const worldState = {
     grid: new Grid(WORLD_WIDTH, WORLD_HEIGHT),
+
+    seed: null,
+    tileMap: null,
+
 
     structures: gameState.currentFace === "A"
         ? [createTower()]
         : [createCenterTown()],
 
-    entities: []
+    entities: [],
+
+    scenographics: []
 };
 
 export default worldState;

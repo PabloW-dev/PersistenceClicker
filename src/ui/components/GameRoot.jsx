@@ -24,7 +24,7 @@ export default function GameRoot() {
 
       <EmitText />
       
-      <canvas ref={canvasRef} width={800} height={600}></canvas>
+      <canvas ref={canvasRef} width={1400} height={800}></canvas>
       
       <FaceSwitcher />
     </div>

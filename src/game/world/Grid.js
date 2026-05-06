@@ -63,9 +63,14 @@ class Grid {
 
     isBlocked(x, y) {
         const cell = this.getCell(x, y);
+
         if (!cell) return true;
 
         if (cell.blocked) return true;
+
+        const tile = worldState.tileMap?.getTile(x, y);
+
+        if (tile?.structureId) return true; //este if hay que cambiarlo, tal y com oestá ahora los árboles van a devolver no walkables
 
         const tower = worldState.structures.find(s => s.type === "tower");
         if (tower) {

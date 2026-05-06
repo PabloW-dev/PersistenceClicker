@@ -10,8 +10,10 @@ import AssetsManager from "../../assets/AssetsManager.js";
 import assetManifest from "../../assets/AssetsManifest.js";
 import timeSystem from "../systems/TimeSystem.js";
 import movementSystem from "../systems/MovementSystem.js";
-import { initSystems, runSystems } from "../../game/faceA/systems/SystemAManager.js";
+import { initSystemsA, runSystemsA } from "../../game/faceA/systems/SystemAManager.js";
+import { initSystemsB, runSystemsB } from "../../game/faceB/systems/SystemBManager.js";
 import ExpSystem from "../systems/ExpSystem.js";
+import changeFace from "../scenes/SceneManager.js";
 
 
 let renderer = null;
@@ -22,7 +24,8 @@ function init(canvas) {
     camera = new Camera(renderer.canvas);
 
     AssetsManager.loadAll(assetManifest);
-    initSystems();
+    initSystemsA();
+    initSystemsB();
 
     renderer.canvas.addEventListener("mouseup", (e) => {
         if (camera.hasDragged) {
@@ -56,7 +59,8 @@ function loop(deltaTime) {
         timeSystem(clampedDelta);
         ExpSystem(clampedDelta);
 
-        runSystems(clampedDelta, camera);
+        runSystemsA(clampedDelta, camera);
+        runSystemsB(clampedDelta, camera);
 
         movementSystem(clampedDelta);
 
@@ -66,6 +70,10 @@ function loop(deltaTime) {
             renderer.canvas.width,
             renderer.canvas.height
         );
+
+        if (gameState.currentFace === "B" && !worldState.tileMap) {
+            changeFace();
+        }
 
         updateGrid(clampedDelta);
 
