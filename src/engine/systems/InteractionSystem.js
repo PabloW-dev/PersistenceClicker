@@ -3,6 +3,7 @@ import worldState from "../../game/world/WorldState";
 import { upgradeLogicianState } from "../../game/progression/UpgradeState.js";
 import { plusTime } from "../../game/faceA/LogicA.js";
 import { plusExp } from "../../game/shared/Exp";
+import { restEXPCanvas, addEXPToCenterTown } from "../../game/faceB/LogicB.js";
 import { getEntityAtPosition } from "./ColliderSystem.js";
 import { findPath } from "../../game/world/PathFinding.js";
 import gameStateA from "../../game/faceA/state/GameStateA.js";
@@ -16,6 +17,15 @@ function interactionSystem(worldPos, camera) {
         e => e.id === gameState.selectedEntityId
     );
 
+    // SCENOGRAPHIQUES
+
+    const scenographic = getEntityAtPosition(worldPos, worldState.scenographics);
+
+    if (scenographic) {
+        gameState.selectedEntityId = null;
+        return;
+    }
+
     // STRUCTURES
     const structure = getEntityAtPosition(worldPos, worldState.structures);
 
@@ -28,6 +38,15 @@ function interactionSystem(worldPos, camera) {
             gameStateA.hint.active = false;
         }
 
+
+        if (structure.type === "centerTown") {
+            
+            if (gameState.currentExp <= 0) return;
+
+            restEXPCanvas(worldPos, camera);
+            addEXPToCenterTown(worldState);
+        }
+
         gameState.selectedEntityId = null;
         return;
     }
@@ -36,7 +55,7 @@ function interactionSystem(worldPos, camera) {
     const entity = getEntityAtPosition(worldPos, worldState.entities);
 
     if (entity) {
-        if (entity.type === "archetype") {
+        if (entity.type === "archetype" || entity.type === "villager") {
             if (!canBeSelected(entity)) return;
 
             if (gameState.selectedEntityId === entity.id) return;

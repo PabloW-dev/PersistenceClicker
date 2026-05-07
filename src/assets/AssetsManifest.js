@@ -20,7 +20,17 @@ import logician from "./sprites/Logician.png"
 
 
 //B
+import villager from "./sprites/Villager.png";
+import medusin from "./sprites/Medusin.png";
+
 import centerTown from "./sprites/CenterTown.png";
+
+import protagonistStatue from "./sprites/ProtagonistStatue.png";
+import logicianStatue from "./sprites/LogicianStatue.png";
+import logisticianStatue from "./sprites/LogisticianStatue.png";
+import defenderStatue from "./sprites/DefenderStatue.png";
+
+import waterOverlay from "./sprites/waterOverlay.png";
 
 import matureOak from "./sprites/MadureOak.png";
 import youngOak from "./sprites/YoungOak.png";
@@ -40,6 +50,15 @@ import oldBirch from "./sprites/OldBirch.png";
 import deadBirch from "./sprites/DeadBirch.png";
 import erasedBirch from "./sprites/ErasedBirch.png";
 
+import Stone from "./sprites/Stone.png";
+import Copper from "./sprites/Copper.png";
+import Tin from "./sprites/Tin.png";
+import Iron from "./sprites/Iron.png";
+
+import RuinOne from "./sprites/RuinOne.png";
+import RuinTwo from "./sprites/RuinTwo.png";
+import RuinThree from "./sprites/RuinThree.png";
+
 const assetManifest = {
     backgroundA: backgroundA,
 
@@ -56,7 +75,17 @@ const assetManifest = {
     protagonist,
     logician,
 
+    villager,
+    medusin,
+
     centerTown,
+
+    protagonistStatue,
+    logicianStatue,
+    logisticianStatue,
+    defenderStatue,
+
+    waterOverlay,
 
     matureOak,
     youngOak,
@@ -74,7 +103,16 @@ const assetManifest = {
     youngBirch,
     oldBirch,
     deadBirch,
-    erasedBirch
+    erasedBirch,
+
+    Stone,
+    Copper,
+    Tin,
+    Iron,
+
+    RuinOne,
+    RuinTwo,
+    RuinThree
 };
 
 export default assetManifest;

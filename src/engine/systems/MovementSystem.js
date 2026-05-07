@@ -16,7 +16,7 @@ export default function movementSystem(deltaTime) {
 
 
         // ARCHETYPES
-        if (entity.type === "archetype") {
+        if (entity.type === "archetype" || entity.type === "villager") {
             followPath(entity, grid, deltaTime);
             continue;
         }

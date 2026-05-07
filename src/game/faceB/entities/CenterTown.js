@@ -22,16 +22,18 @@ function createCenterTown() {
         },
 
         collider: {
-            radius: 40, //TO DO : ADJUST!
+            radius: 70, //TO DO : ADJUST!
             offset: {
                 x: 0,
-                y: -50
+                y: 0
             }
         },
 
         data: {
             navSize: 3,
             navOffsetY: 0,
+
+            navRadiusPx: 70
         }
     });
 }

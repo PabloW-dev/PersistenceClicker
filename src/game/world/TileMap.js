@@ -96,12 +96,17 @@ class TileMap {
         const dy = worldY - 800;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        const radiusPx = 210;
-
-        if (dist < radiusPx) {
+        if (dist < 160) {
             return new Tile({
                 groundType: "center",
                 factionType: "center"
+            });
+        }
+
+        if (dist < 224 && dist > 160) {
+            return new Tile({
+                groundType: "centerRing",
+                factionType: "centerRing"
             });
         }
 
@@ -121,9 +126,60 @@ class TileMap {
             ];
         }
 
+        let groundData = {};
+
+        if(type === "water") {
+            const r = this.random(x, y, 500); //500 for another pattern of random
+
+            let variant;
+            let maxWater;
+            let rechargeRate;
+
+            if(r < 0.95) {
+                variant = "normal";
+                maxWater = 0;
+                rechargeRate = 0;
+            } else if(r < 0.98) {
+                variant = "small";
+                maxWater = 75;
+                rechargeRate = 2;
+            } else if(r < 0.995) {
+                variant = "medium";
+                maxWater = 150;
+                rechargeRate = 1;
+            } else {
+                variant = "large";
+                maxWater = 250;
+                rechargeRate = 0.5;
+            }
+
+            let slipChance;
+
+            if (variant === "normal") slipChance = 0.1;
+            else if (variant === "small") slipChance = 0.2;
+            else if (variant === "medium") slipChance = 0.35;
+            else if (variant === "large") slipChance = 0.5;
+
+            groundData = {
+                variant, // 0 -> 1
+                maxWater,
+                rechargeRate,
+                slipChance
+            };
+        }
+
+        if(type === "rocks") {
+            const hardness = (value - thresholds.fertile) / (1 - thresholds.fertile); //por qué usas fertile? eso resulta otro tipo de terreno!
+
+            groundData = {
+                hardness
+            };
+        }
+
         return new Tile({
             groundType: type,
-            factionType: this.getFactionType(x, y)
+            factionType: this.getFactionType(x, y),
+            groundData
         });
     }
 

@@ -37,6 +37,26 @@ export default function EmitText() {
                 }
             ]);
 
+            
+            setTimeout(() => {
+                setFloatingTexts(prev => prev.filter(t => t.id !== id));
+            }, 500);
+        });
+
+        const unsubscribeLost = on("EXPlosted", (data) => {
+            const id = crypto.randomUUID();
+
+            setFloatingTexts(prev => [
+                ...prev,
+                {
+                    id,
+                    text: `-${data.value} EXP`,
+                    x: data.pos.x,
+                    y: data.pos.y
+                }
+            ]);
+
+            
             setTimeout(() => {
                 setFloatingTexts(prev => prev.filter(t => t.id !== id));
             }, 500);
@@ -45,6 +65,7 @@ export default function EmitText() {
         return () => {
             unsubscribeGain();
             unsubscribeDrain();
+            unsubscribeLost();
         };
     }, []);
 

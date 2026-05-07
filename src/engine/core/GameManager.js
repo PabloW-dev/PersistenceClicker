@@ -2,6 +2,7 @@
 // general game coordination, flow management between FaceA and FaceB
 import CanvasRenderer from "../renderer/CanvasRenderer.js";
 import interactionSystem from "../systems/InteractionSystem.js";
+import spawnAnimationSystem from "../../game/faceA/systems/SpawnAnimationSystem.js";
 import gameState from "../../game/state/GameStateG.js";
 import worldState from "../../game/world/WorldState.js";
 import { updateGrid } from "../../game/world/Map.js";
@@ -61,6 +62,8 @@ function loop(deltaTime) {
 
         runSystemsA(clampedDelta, camera);
         runSystemsB(clampedDelta, camera);
+
+        spawnAnimationSystem(clampedDelta);
 
         movementSystem(clampedDelta);
 

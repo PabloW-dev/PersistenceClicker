@@ -7,7 +7,7 @@ import createTower from "../faceA/entities/Tower.js";
 import createCenterTown from "../faceB/entities/CenterTown.js";
 import gameState from "../state/GameStateG.js";
 
-const WORLD_WIDTH = 2000;
+const WORLD_WIDTH = 2048;
 const WORLD_HEIGHT = 1600;
 
 

@@ -70,21 +70,22 @@ class Grid {
 
         const tile = worldState.tileMap?.getTile(x, y);
 
-        if (tile?.structureId) return true; //este if hay que cambiarlo, tal y com oestá ahora los árboles van a devolver no walkables
+        if (tile?.structureId) return true;
 
-        const tower = worldState.structures.find(s => s.type === "tower");
-        if (tower) {
-            const cellSize = this.cellSize;
+        const blockingStructure = worldState.structures.find(
+            s => s.type === "tower" || s.type === "centerTown"
+        );
 
-            const worldX = x * cellSize + cellSize / 2;
-            const worldY = y * cellSize + cellSize / 2;
+        if (blockingStructure) {
+            const worldX = x * this.cellSize + this.cellSize / 2;
+            const worldY = y * this.cellSize + this.cellSize / 2;
 
-            const dx = worldX - tower.x;
-            const dy = worldY - tower.y;
+            const dx = worldX - blockingStructure.x;
+            const dy = worldY - blockingStructure.y;
 
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            const radiusPx = tower.data?.navRadiusPx ?? 96;
+            const radiusPx = blockingStructure.data?.navRadiusPx ?? 96;
 
             if (dist < radiusPx) {
                 return true;

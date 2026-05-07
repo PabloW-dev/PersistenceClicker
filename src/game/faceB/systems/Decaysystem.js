@@ -5,8 +5,16 @@ import { TreeStatesManager } from "./MachineStatesB";
 
 const AGE_SPEED = 100 / 86400;
 
+
+
 export default function decaySystem(deltaTime) {
-    //TO DO: Make general for al things of worldState
+    const ruinTypes = new Set([
+        "RuinOne",
+        "RuinTwo",
+        "RuinThree"
+    ]);
+
+    const ruinsToRemove = [];
 
     for (const scenographique of worldState.scenographics) {
         
@@ -80,5 +88,75 @@ export default function decaySystem(deltaTime) {
 
             scenographique.data.scale += (scenographique.data.targetScale - scenographique.data.scale) * speed * deltaTime;
         }
+    }
+
+    for (const scenographique of worldState.scenographics) {
+
+        if (
+            scenographique.data.spriteType !== "Stone" &&
+            scenographique.data.spriteType !== "Copper" &&
+            scenographique.data.spriteType !== "Tin" &&
+            scenographique.data.spriteType !== "Iron"
+        ) continue;
+
+        if (!scenographique.data.depleted) continue;
+
+        scenographique.data.years += deltaTime * AGE_SPEED;
+
+        const tile = worldState.tileMap?.getTile(
+            scenographique.tileX,
+            scenographique.tileY
+        );
+        
+        //Llevar esto al sistema de minería cuando exista:
+        if(!scenographique.data.blockMovement) {
+            if (tile) {
+                tile.structureId = null;
+            }
+
+        }
+
+        if (scenographique.data.years >= scenographique.data.yearsForRegenerate) {
+
+            scenographique.data.hp = scenographique.data.maxHp;
+
+            scenographique.data.depleted = false;
+
+            scenographique.data.years = 0;
+
+            scenographique.data.blockMovement = true;
+
+            if (tile) {
+                tile.structureId = scenographique.id;
+            }
+        }
+    }
+
+    for (const scenographique of worldState.scenographics) {
+
+        if (!ruinTypes.has(scenographique.data.spriteType)) continue;
+
+        scenographique.data.years += deltaTime * AGE_SPEED;
+
+        if (scenographique.data.years >= scenographique.data.yearsToErase) {
+            
+            ruinsToRemove.push(scenographique.id);
+
+            const tile = worldState.tileMap?.getTile(
+                scenographique.tileX,
+                scenographique.tileY
+            );
+
+            if (tile?.structureId === scenographique.id) {
+                tile.structureId = null;
+            }
+        }
+    }
+
+    if (ruinsToRemove.length > 0) {
+        worldState.scenographics =
+            worldState.scenographics.filter(
+                s => !ruinsToRemove.includes(s.id)
+            );
     }
 }

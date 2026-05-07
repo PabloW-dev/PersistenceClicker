@@ -8,6 +8,7 @@ const gameState = {
     gameStart: true,
     activeProcesses: [],
     timeShakeTrigger: 0,
+    timeShakeTriggerEXP: 0,
     selectedEntityId: null, //because I don't want a value since beggining, only for give values
     firstRun: true
 };

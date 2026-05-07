@@ -49,8 +49,6 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         ctx.translate(-camera.x, -camera.y);
 
         //drawing background
-        
-
         if(assetManifest.backgroundA) {
             const backgroundImg = AssetsManager.getImage("backgroundA");
 
@@ -94,7 +92,7 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         const tileMap = worldState.tileMap;
         const grid = worldState.grid;
 
-        if(tileMap) { //no podemos decirle que currentFace B porque entonces no los pintará en A, yo quiero que se generen al entrar a B pero que luego persistan en A
+        if(tileMap) {
             for (let x = 0; x < tileMap.width; x++) {
                 for (let y = 0; y < tileMap.height; y++) {
                     const tile = tileMap.getTile(x, y);
@@ -315,16 +313,59 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
     }
 
     drawTile(ctx, tile, pos, size) {
-        const baseColor = this.getGroundColor(tile.groundType);
+        let baseColor = this.getGroundColor(tile.groundType);
+
+        const variant = tile.groundData?.variant;
+        
+        if (tile.groundType === "water" && variant) {
+            const variant = tile.groundData.variant;
+
+            if (variant === "small") {
+                baseColor = [30, 90, 160]; // más oscuro
+            } else if (variant === "medium") {
+                baseColor = [50, 120, 200]; // base
+            } else if (variant === "large") {
+                baseColor = [80, 160, 230]; // más claro
+            } else {
+                baseColor = [40, 100, 180]; // agua fea, poco profunda
+            }
+        }
+        
         const finalColor = this.applyFactionTint(baseColor, tile.factionType);
 
         ctx.fillStyle = finalColor;
+
         ctx.fillRect(
             pos.x - size / 2,
             pos.y - size / 2,
             size,
             size
         );
+
+        if (
+            tile.groundType === "water" &&
+            tile.groundData?.variant !== "normal"
+        ) {
+            const img = AssetsManager.getImage("waterOverlay");
+
+            if (img && img.complete) {
+                ctx.save();
+
+                if (variant === "small") ctx.globalAlpha = 0.5;
+                else if (variant === "medium") ctx.globalAlpha = 0.7;
+                else ctx.globalAlpha = 0.9;
+
+                ctx.drawImage(
+                    img,
+                    pos.x - size / 2,
+                    pos.y - size / 2,
+                    size,
+                    size
+                );
+
+                ctx.restore();
+            }
+        }
     }
 
     getGroundColor(type) {
@@ -334,6 +375,7 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
             case "fertile": return [80, 170, 90];
             case "rocks": return [5, 5, 5];
             case "center": return [240, 240, 240];
+            case "centerRing": return [210, 210, 210];
             default: return [255, 0, 255]; // debug
         }
     }
@@ -361,6 +403,9 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
             case "center":
                 return "rgb(255,255,255)";
+
+            case "centerRing":
+                return "rgb(210,210,210)";
         }
 
         // clamp
