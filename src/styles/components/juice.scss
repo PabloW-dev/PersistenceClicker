@@ -1,5 +1,7 @@
-.time {
+.time,
+.exp {
     display: inline-block;
+    margin-left: 2rem;
 }
 
 .shake {
@@ -10,7 +12,6 @@
     color: #ff4d4d;
     text-shadow: 0 0 6px rgba(255, 80, 80, 0.8);
 }
-
 
 @keyframes shake {
     0% { transform: translateX(0); }

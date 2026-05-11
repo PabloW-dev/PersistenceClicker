@@ -4,6 +4,7 @@ import { init } from "../../engine/core/GameManager.js";
 import EmitText from './EmitText.jsx';
 import HUD from './HUD';
 import FaceSwitcher from './FaceSwitcher';
+import FaceInformationSwitcher from './FaceInformationSwitcher.jsx';
 
 export default function GameRoot() {
     const canvasRef = useRef(null);
@@ -19,14 +20,17 @@ export default function GameRoot() {
         };
     }, []);
   return (
-    <div>
+    <>
       <HUD />
+      <FaceInformationSwitcher />
 
-      <EmitText />
+      <div className="canvas-wrapper">
+        <EmitText />
       
-      <canvas ref={canvasRef} width={1400} height={800}></canvas>
+        <canvas ref={canvasRef} width={1400} height={800}></canvas>
+      </div>
       
       <FaceSwitcher />
-    </div>
+    </>
   )
 }

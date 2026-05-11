@@ -6,34 +6,55 @@ import useGameStateA from '../../hooks/useState';
 
 export default function HUD() {
     const state = useGameStateA();
-    const [shake, setShake] = useState(false);
+    const [timeShake, setTimeShake] = useState(false);
+    const [expShake, setExpShake] = useState(false);
 
-    const lastTrigger = state.timeShakeTrigger;
-
-
+    const lastTriggerTime = state.timeShakeTrigger;
+    const lastTriggerExp = state.timeShakeTriggerEXP;
+    //TIME:
     useEffect(() => {
-      if (!lastTrigger) return;
+      if (!lastTriggerTime) return;
 
-      setShake(false);
+      setTimeShake(false);
 
       const frame = requestAnimationFrame(() => {
-        setShake(true);
+        setTimeShake(true);
       });
 
       const t = setTimeout(() => {
-        setShake(false);
+        setTimeShake(false);
       }, 120);
 
       return () => {
         cancelAnimationFrame(frame);
         clearTimeout(t);
       };
-    }, [lastTrigger]);
+    }, [lastTriggerTime]);
+
+    useEffect(() => {
+      if (!lastTriggerExp) return;
+
+      setExpShake(false);
+
+      const frame = requestAnimationFrame(() => {
+        setExpShake(true);
+      });
+
+      const t = setTimeout(() => {
+        setExpShake(false);
+      }, 120);
+
+      return () => {
+        cancelAnimationFrame(frame);
+        clearTimeout(t);
+      };
+    }, [lastTriggerExp]);
 
   return (
     <div>
-      <p>EXP: {state.currentExp.toFixed(2)}</p>
-      <p className={`time ${shake ? "shake flash" : ""}`}>Time: {state.currentTime.toFixed(2)}</p>
+      <p className={`exp ${expShake ? "shake flash" : ""}`}
+      >EXP: {state.currentExp.toFixed(2)}</p>
+      <p className={`time ${timeShake ? "shake flash" : ""}`}>Time: {state.currentTime.toFixed(2)}</p>
     </div>
   );
 }

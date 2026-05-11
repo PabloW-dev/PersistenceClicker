@@ -287,7 +287,7 @@ function spawnVillager(worldState) {
     console.log(worldState.entities);
 }
 
-function getVillagerCost(worldState) {
+export function getVillagerCost(worldState) {
 
     const villagers = worldState.entities.filter(
         e => e.type === "villager"

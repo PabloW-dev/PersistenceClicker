@@ -2,10 +2,16 @@
 //this cycle expend a 1 REAL day inside of B, so will needs persistance of the data
 import worldState from "../../world/WorldState";
 import { TreeStatesManager } from "./MachineStatesB";
+import { villagerStatesManager } from "./MachineStatesB";
 
 const AGE_SPEED = 100 / 86400;
-
-
+const AGE_SPEED_VILLAGER = 100 / 259200;
+const AGE_SPEED_ROCKS = 100 / 432.000;
+const THRIST = 100 / 7200;
+const HUNGRY = 100 / 14400;
+const STARVATION = 100 / 3600;
+const DEHYDRATION = 100 / 900;
+const EXHAUSTION = 100 / 1800;
 
 export default function decaySystem(deltaTime) {
     const ruinTypes = new Set([
@@ -15,10 +21,13 @@ export default function decaySystem(deltaTime) {
     ]);
 
     const ruinsToRemove = [];
+    const villagersToRemove = [];
+    const treesToRemove = [];
 
     for (const scenographique of worldState.scenographics) {
         
         if (scenographique.data.age === undefined) continue; //because we wants 0 for the count
+        if (scenographique.data.state === "cutting") continue;
 
         if (
             scenographique.data.state === "dead" &&
@@ -88,6 +97,26 @@ export default function decaySystem(deltaTime) {
 
             scenographique.data.scale += (scenographique.data.targetScale - scenographique.data.scale) * speed * deltaTime;
         }
+
+        if(scenographique.data.hp <= 0) {
+            treesToRemove.push(scenographique.id);
+
+            const tile = worldState.tileMap?.getTile(
+                scenographique.tileX,
+                scenographique.tileY
+            );
+
+            if (tile?.structureId === scenographique.id) {
+                tile.structureId = null;
+            }
+        }
+    }
+
+    if (treesToRemove.length > 0) {
+        worldState.scenographics =
+            worldState.scenographics.filter(
+                s => !treesToRemove.includes(s.id)
+            );
     }
 
     for (const scenographique of worldState.scenographics) {
@@ -101,7 +130,7 @@ export default function decaySystem(deltaTime) {
 
         if (!scenographique.data.depleted) continue;
 
-        scenographique.data.years += deltaTime * AGE_SPEED;
+        scenographique.data.years += deltaTime * AGE_SPEED_ROCKS;
 
         const tile = worldState.tileMap?.getTile(
             scenographique.tileX,
@@ -138,7 +167,7 @@ export default function decaySystem(deltaTime) {
 
         scenographique.data.years += deltaTime * AGE_SPEED;
 
-        if (scenographique.data.years >= scenographique.data.yearsToErase) {
+        if (scenographique.data.years >= scenographique.data.yearsToErase || scenographique.data.hp <= 0) {
             
             ruinsToRemove.push(scenographique.id);
 
@@ -159,4 +188,71 @@ export default function decaySystem(deltaTime) {
                 s => !ruinsToRemove.includes(s.id)
             );
     }
+
+    for (const entity of worldState.entities) {
+
+        if (entity.type !== "villager") continue; //simply check for take only the villgers
+
+        //decay:
+        entity.data.age += deltaTime * AGE_SPEED_VILLAGER;
+        
+        entity.data.water = Math.max(
+            0,
+            entity.data.water - deltaTime * THRIST * entity.data.waterDecay
+        );
+
+        entity.data.food = Math.max(
+            0,
+            entity.data.food - deltaTime * HUNGRY * entity.data.foodDecay
+        );
+
+        //péridda de vida:
+        if (entity.data.water <= 0) {
+            entity.data.hp -= deltaTime * DEHYDRATION;
+        }
+
+        if (entity.data.food <= 0) {
+            entity.data.hp -= deltaTime * STARVATION;
+        }
+
+        if (entity.data.energy <= 0) {
+            entity.data.hp -= deltaTime * EXHAUSTION;
+        }
+
+        //muerte por stats:
+        if (entity.data.hp <= 0) {
+            villagerStatesManager(entity, "dead");
+
+            entity.data.path = [];
+            entity.data.pathIndex = 0;
+            entity.data.target = null;
+            entity.data.actionTarget = null;
+            entity.data.actionType = null;
+
+            villagersToRemove.push(entity.id);
+        }
+
+        //muerte por edad:
+        if (entity.data.age >= entity.data.ageMax) {
+            villagerStatesManager(entity, "dead");
+
+            entity.data.path = [];
+            entity.data.pathIndex = 0;
+            entity.data.target = null;
+            entity.data.actionTarget = null;
+            entity.data.actionType = null;
+            
+            villagersToRemove.push(entity.id);
+        }
+
+        if (entity.data.warningFlash > 0) {
+            entity.data.warningFlash -= deltaTime;
+        }
+    }
+
+    if (villagersToRemove.length > 0) {
+        worldState.entities = worldState.entities.filter(
+                e => !villagersToRemove.includes(e.id)
+            );
+    }    
 }

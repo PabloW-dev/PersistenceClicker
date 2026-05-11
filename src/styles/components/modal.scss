@@ -24,3 +24,35 @@
     max-width: 300px;
     pointer-events: auto;
 }
+
+.warning-stat {
+    color: #ff4d4d;
+}
+
+.modal-input {
+    width: 100%;
+    
+    background: none;
+    border: none;
+
+    color: #00E5FF;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus {
+        box-shadow: 0 0 4px rgba(0, 229, 255, 0.25);
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    &::placeholder {
+        color: rgba(255, 255, 255, 0.35);
+    }
+}
+

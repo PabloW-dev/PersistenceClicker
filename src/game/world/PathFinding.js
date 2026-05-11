@@ -92,3 +92,51 @@ export function getNearestWalkableCell(target, grid) {
 
     return candidates[Math.floor(Math.random() * candidates.length)];
 }
+
+export function getNearestResourceCell(target, from, grid) {
+    const center = grid.worldToGrid(target);
+
+    const candidates = [];
+
+    for (const dir of directions) {
+        const x = center.x + dir.x;
+        const y = center.y + dir.y;
+
+        if (!grid.isValidCell(x, y)) continue;
+        if (grid.isBlocked(x, y)) continue;
+
+        candidates.push({ x, y });
+    }
+
+    if (candidates.length === 0) {
+        return center;
+    }
+
+    return candidates.reduce((best, cell) => {
+        const bestDist = Math.hypot(
+            best.x - from.x,
+            best.y - from.y
+        );
+
+        const cellDist = Math.hypot(
+            cell.x - from.x,
+            cell.y - from.y
+        );
+
+        return cellDist < bestDist
+            ? cell
+            : best;
+    });
+}
+
+export function isAtTargetCell(entity, targetCell, grid) {
+    const currentCell = grid.worldToGrid({
+        x: entity.x,
+        y: entity.y
+    });
+
+    return (
+        currentCell.x === targetCell.x &&
+        currentCell.y === targetCell.y
+    );
+}

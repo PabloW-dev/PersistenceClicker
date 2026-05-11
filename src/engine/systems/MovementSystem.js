@@ -1,6 +1,7 @@
 import worldState from "../../game/world/WorldState";
 import { canMove } from "../../utils/entitiesState";
 import { findPath, getNearestWalkableCell } from "../../game/world/PathFinding";
+import { GroundMoveCost } from "../../game/world/Tile";
 
 const SPEED = 10;
 
@@ -139,6 +140,26 @@ function followPath(entity, grid, deltaTime) {
         entity.data.path = [];
         entity.data.pathIndex = 0;
 
+        if (entity.type === "villager") {
+
+            if (
+                entity.data.actionTarget?.data?.yearsToErase &&
+                !entity.data.hiddenInStructure
+            ) {
+                entity.data.hiddenInStructure = true;
+                entity.collider.radius = 0;
+                entity.data.hiddenTimer = entity.data.actionCooldown * 3;
+            }
+            
+            if (entity.data.actionType) {
+                entity.data.state = entity.data.actionType;
+            } else {
+                entity.data.state = "idle";
+            }
+
+            return;
+        }
+
         //idle
         if (!entity.data.combatTarget && entity.data.state !== "attacking") {
             entity.data.state = "idle";
@@ -153,7 +174,17 @@ function followPath(entity, grid, deltaTime) {
     const dy = next.y - entity.y;
 
     const dist = Math.hypot(dx, dy);
-    const move = SPEED * entity.data.speed * deltaTime;
+
+    let speedFactor = 1;
+
+    if (entity.type === "villager") {
+        speedFactor = Math.max(
+            0.2,
+            entity.data.energy / entity.data.energyMax
+        );
+    }
+
+    const move = SPEED * entity.data.speed * speedFactor * deltaTime;
 
     if (dist < 2) {
         entity.data.pathIndex++;
@@ -170,6 +201,46 @@ function followPath(entity, grid, deltaTime) {
     } else {
         entity.x += dirX * move;
         entity.y += dirY * move;
+    }
+
+    if (entity.type === "villager") {
+        const currentCell = grid.worldToGrid({
+            x: entity.x,
+            y: entity.y
+        });
+
+        const tile = worldState.tileMap?.getTile(
+            currentCell.x,
+            currentCell.y
+        );
+
+        const moveCost = GroundMoveCost[tile?.groundType] ?? 1;
+
+        if(!entity.data.lastStepCell) {
+            entity.data.lastStepCell = currentCell;
+        }
+
+        if(
+            currentCell.x !== entity.data.lastStepCell.x ||
+            currentCell.y !== entity.data.lastStepCell.y
+        ) {
+            entity.data.steps++;
+
+            entity.data.lastStepCell = currentCell;
+
+            entity.data.movementFatigue +=
+                moveCost * entity.data.energyDecay;
+
+            while (entity.data.movementFatigue >= 5) {
+                entity.data.energy = Math.max(
+                    0,
+                    entity.data.energy - 1
+                );
+
+                entity.data.movementFatigue = 0;
+            }
+            
+        }
     }
 }
 

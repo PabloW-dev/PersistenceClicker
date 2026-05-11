@@ -11,4 +11,14 @@ class Tile {
     }
 }
 
+export const GroundMoveCost = {
+    plain: 1,
+    fertile: 1.2,
+    rocks: 1.8,
+    water: 0.5,
+    center: 1,
+    centerRing: 1
+};
+
 export default Tile;
+

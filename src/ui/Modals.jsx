@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { on } from '../utils/events';
 import ArchetypeModal from './modals/ArchetypeModal';
 import LogicianModal from "./modals/LogicianModal";
+import VillagerModal from './modals/VillagerModal';
 
 export default function Modals() {
     const [modal, setModal] = useState({
@@ -46,6 +47,10 @@ export default function Modals() {
 
       {modal.type === "logician" && (
         <LogicianModal entityId="logician" />
+      )}
+
+      {modal.type === "villager" && (
+        <VillagerModal entityId={modal.payload.entityId} />
       )}
     </div>
   );

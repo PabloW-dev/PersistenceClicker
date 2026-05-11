@@ -135,6 +135,35 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                 );
 
                 ctx.restore();
+
+                const worker = worldState.entities.find(e =>
+                    e.type === "villager" &&
+                    e.data.actionTarget?.id === scenographique.id &&
+                    e.data.state === "obtaining_resources" &&
+                    e.data.path.length <= 0
+                );
+
+                const boostable = worker && !gameState.selectedEntityId;
+
+                if(boostable) {
+                    const pulse = 0.7 + Math.sin(Date.now() * 0.01) * 0.3;
+
+                    ctx.save();
+
+                    ctx.translate(scenographique.x, scenographique.y);
+
+                    ctx.globalAlpha = pulse;
+
+                    ctx.strokeStyle = "rgba(255,255,120,0.9)";
+                    ctx.lineWidth = 3;
+
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 24, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.restore();
+
+                }
             }
         });
 
@@ -162,6 +191,11 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
         // drawing entities
         worldState.entities.forEach(entity => {
+
+            if (entity.data?.hiddenInStructure) {
+                return;
+            }
+
             if (entity.sprite) {
                 const img = AssetsManager.getImage(entity.sprite.type);
 
@@ -201,10 +235,68 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
                     ctx.translate(entity.x, entity.y);
 
+                    // villager warning flash
+                    if (
+                        entity.type === "villager" &&
+                        entity.data?.warningFlash > 0
+                    ) {
+                        const shake =
+                            Math.sin(Date.now() * 0.05) *
+                            entity.data.warningFlash *
+                            6;
+
+                        ctx.translate(shake, 0);
+
+                        switch (entity.data.warningType) {
+                            case "energy":
+                                ctx.globalAlpha *= 0.7 + Math.sin(Date.now() * 0.08) * 0.3;
+                                break;
+
+                            case "food":
+                                ctx.globalAlpha *= 0.8;
+                                break;
+
+                            case "water":
+                                scale *= 0.9 + Math.sin(Date.now() * 0.04) * 0.08;
+                                break;
+
+                            case "inventory":
+                                scale *= 0.85;
+                                break;
+
+                            case "profession":
+                                ctx.globalAlpha *= 0.5;
+                                break;
+
+                            case "resource":
+                                scale *= 0.95;
+                                ctx.globalAlpha *= 0.6;
+                            break;
+                        }
+                    }
+
                     if (entity.data?.state === "dead") {
                         ctx.rotate(Math.PI / 2); // 90º
                         ctx.globalAlpha *= 0.6;
                     }
+
+                    // ACTION FLASH
+                    if (entity.data?.actionFlash > 0) {
+                        const shakeX =
+                            (Math.random() - 0.5) *
+                            entity.data.actionFlash *
+                            6;
+
+                        const shakeY =
+                            (Math.random() - 0.5) *
+                            entity.data.actionFlash *
+                            4;
+
+                        ctx.translate(shakeX, shakeY);
+
+                        scale *= 1.03;
+                    }
+
                     ctx.scale(scale, scale);
 
                     ctx.drawImage(
@@ -281,6 +373,7 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
 
         if (!selected) return;
+        if (selected.data?.hiddenInStructure) return;
 
         const x = selected.x;
         const y = selected.y;

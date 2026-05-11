@@ -115,8 +115,8 @@ export function createRuin(x, y, tileX, tileY, spriteType) {
         },
 
         data: {
-            hp: 30, //por cada punto genera 1 de agua y PUEDE generar 1 de madera y 1 de piedra. Esto se traduce en que al scoutearla podrías conseguir 1 de cada, o 1 de agua y 1 de madera, o 1 de agua y 1 de piedra
-            maxHp: 30,
+            hp: 5, //por cada punto genera 1 de agua y PUEDE generar 1 de madera y 1 de piedra. Esto se traduce en que al scoutearla podrías conseguir 1 de cada, o 1 de agua y 1 de madera, o 1 de agua y 1 de piedra
+            maxHp: 5,
 
             spriteType,
             

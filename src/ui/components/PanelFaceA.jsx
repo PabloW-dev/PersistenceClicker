@@ -14,7 +14,7 @@ export default function PanelFaceA() {
     if (state.currentFace !== "A") return null;
 
   return (
-    <div className="game-container">
+    <div>
         
 
 

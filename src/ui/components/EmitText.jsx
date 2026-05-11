@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import gameState from '../../game/state/GameStateG';
 import { on } from '../../utils/events';
 
 export default function EmitText() {
@@ -21,7 +22,7 @@ export default function EmitText() {
 
             setTimeout(() => {
                 setFloatingTexts(prev => prev.filter(t => t.id !== id));
-            }, 500);
+            }, 1500);
         });
 
         const unsubscribeDrain = on("timeDrained", (data) => {
@@ -40,7 +41,7 @@ export default function EmitText() {
             
             setTimeout(() => {
                 setFloatingTexts(prev => prev.filter(t => t.id !== id));
-            }, 500);
+            }, 1500);
         });
 
         const unsubscribeLost = on("EXPlosted", (data) => {
@@ -59,7 +60,7 @@ export default function EmitText() {
             
             setTimeout(() => {
                 setFloatingTexts(prev => prev.filter(t => t.id !== id));
-            }, 500);
+            }, 1500);
         });
 
         return () => {
@@ -74,7 +75,7 @@ export default function EmitText() {
             {floatingTexts.map(t => (
                 <p
                     key={t.id}
-                    className="floating-text"
+                    className={`floating-text ${gameState.currentFace === "A" ? "A" : "B"}`}
                     style={{
                         left: t.x,
                         top: t.y

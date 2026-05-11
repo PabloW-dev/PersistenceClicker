@@ -5,6 +5,14 @@ export function randomFrom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
+export function randomRate(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+export function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export function getRandomSpawnPosition(center, minR, maxR) {
     const angle = Math.random() * Math.PI * 2;
 
