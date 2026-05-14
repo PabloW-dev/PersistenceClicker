@@ -6,6 +6,7 @@ import { on } from '../utils/events';
 import ArchetypeModal from './modals/ArchetypeModal';
 import LogicianModal from "./modals/LogicianModal";
 import VillagerModal from './modals/VillagerModal';
+import BuildingModal from './modals/BuildingModal';
 
 export default function Modals() {
     const [modal, setModal] = useState({
@@ -51,6 +52,10 @@ export default function Modals() {
 
       {modal.type === "villager" && (
         <VillagerModal entityId={modal.payload.entityId} />
+      )}
+
+      {modal.type === "structure" && (
+        <BuildingModal structureId={modal.payload.structureId} />
       )}
     </div>
   );

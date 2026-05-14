@@ -5,6 +5,16 @@
 const gameStateB = {
     EXPinCenterTown: 0,
     EXPtoNextVillager: 0,
+
+    buildMode: {
+        active: false,
+        buildingId: null,
+
+        hoverTileX: null,
+        hoverTileY: null,
+
+        canPlace: false
+    }
 }
 
 export default gameStateB;

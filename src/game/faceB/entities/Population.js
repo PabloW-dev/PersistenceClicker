@@ -103,7 +103,9 @@ export function createVillager(x, y, spriteType) {
             spawnProgress: 0,
 
             hiddenTimer: 0,
-            hiddenInStructure: false
+            hiddenInStructure: false,
+
+            blockedTimer: 0
         }
     });
 }

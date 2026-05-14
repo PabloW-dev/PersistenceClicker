@@ -1,5 +1,6 @@
 //profesions of the villagers
 // ProfessionSystem.js
+import { updateInventorySpace } from "../../../utils/inventory";
 
 export function professionSystem(entity, profession, amount) {
 
@@ -113,25 +114,32 @@ function applyProfessionBuffs(entity) {
         entity.data.inventory.carryCapacity =
             entity.data.inventory.baseCarryCapacity +
             carryBonusByLevel[level];
+
+        updateInventorySpace(entity);
+    }
+
+    else if (profession === "deliverer") {
+        const speedBonusByLevel = [0, 2, 4, 8];
+        const carryBonusByLevel = [0, 2, 5, 10];
+
+        entity.data.speed = entity.data.baseSpeed + speedBonusByLevel[level];
+        entity.data.inventory.carryCapacity = entity.data.inventory.baseCarryCapacity + carryBonusByLevel[level];
+
+        updateInventorySpace(entity);
     }
 
     // FUTURAS PROFESIONES
 
-    //else if (profession === "runner") {
+    else if (profession === "builder") {
 
-    //    const speedBonusByLevel = [0, 1, 2, 4];
+        const hpBonusByLevel = [0, 25, 50, 100];
+        const cooldownReductionByLevel = [0, 1, 2, 3];
 
-    //    entity.data.speed =
-    //        entity.data.baseSpeed +
-    //        speedBonusByLevel[level];
-    //}
-
-    //else if (profession === "guardian") {
-
-    //    const hpBonusByLevel = [0, 10, 25, 50];
-
-    //    entity.data.hpMax =
-    //        entity.data.baseMaxHp +
-    //        hpBonusByLevel[level];
-    //}
+        entity.data.hpMax = entity.data.baseMaxHp + hpBonusByLevel[level];
+        entity.data.actionCooldown = Math.max(
+            1,
+            entity.data.baseActionCooldown -
+            cooldownReductionByLevel[level]
+        );
+    }
 }

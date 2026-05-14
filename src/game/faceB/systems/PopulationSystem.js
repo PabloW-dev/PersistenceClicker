@@ -18,10 +18,6 @@ export const POPULATION = {
 };
 
 export function populationSystem() {
-    //quiero que esto primero calcule el total de población posible
-    //y que cuente cuántos villagers hay
-    //para luego mostrarlo en pantalla como 3 / 5, por ejemplo
-
     //población inicial
     const villagers = worldState.entities.filter(e => e.type === "villager").length;
 

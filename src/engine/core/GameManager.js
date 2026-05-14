@@ -15,6 +15,7 @@ import { initSystemsA, runSystemsA } from "../../game/faceA/systems/SystemAManag
 import { initSystemsB, runSystemsB } from "../../game/faceB/systems/SystemBManager.js";
 import ExpSystem from "../systems/ExpSystem.js";
 import changeFace from "../scenes/SceneManager.js";
+import { updateBuildMode } from "../../game/faceB/systems/ConstructionSystem.js";
 
 
 let renderer = null;
@@ -47,6 +48,12 @@ function init(canvas) {
 
         camera.endInteraction();
     });
+
+    renderer.onMouseMove = (screenPos) => {
+        const worldPos = camera.screenToWorld(screenPos);
+
+        updateBuildMode(worldPos);
+    };
 }
 
 function loop(deltaTime) {

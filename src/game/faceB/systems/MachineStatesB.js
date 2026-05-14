@@ -41,6 +41,7 @@ export function TreeStatesManager(scenographique, newState) {
         tree.data.hp = 0;
         tree.data.targetScale = 0.01;
         tree.collider.radius = 0;
+        tree.data.reservedBy = null;
     }
 
     tree.sprite.type = getSpriteType(newState, tree.data.species);

@@ -62,6 +62,12 @@ import RuinOne from "./sprites/RuinOne.png";
 import RuinTwo from "./sprites/RuinTwo.png";
 import RuinThree from "./sprites/RuinThree.png";
 
+//BUILDINGS of B
+import emplacement from "./sprites/Emplacement.png";
+
+import villagerHouse from "./sprites/villagerHouse.png";
+import villagerHouseInConstruction from "./sprites/villagerHouseInConstruction.png";
+
 const assetManifest = {
     backgroundA: backgroundA,
 
@@ -118,7 +124,12 @@ const assetManifest = {
 
     RuinOne,
     RuinTwo,
-    RuinThree
+    RuinThree,
+
+    emplacement,
+
+    villagerHouse,
+    villagerHouseInConstruction
 };
 
 export default assetManifest;

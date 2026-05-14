@@ -13,7 +13,7 @@ export default function SubHUDB() {
         <p>Stored EXP: {gameStateB.EXPinCenterTown.toFixed(0)}</p>
         <p>Next Villager: {nextCost.toFixed(0)}</p>
 
-        <p>POPULATION: {POPULATION.currentPopulation} / {POPULATION.currentMaxPopulation} </p>
+        <p>POPULATION: {POPULATION.villagers.currentPopulation} / {POPULATION.villagers.currentMaxPopulation} </p>
     </div>
   );
 }

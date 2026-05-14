@@ -25,7 +25,8 @@ class Grid {
             for (let y = 0; y < this.height; y++) {
                 grid[x][y] = {
                     blocked: false,
-                    structureId: null
+                    structureId: null,
+                    occupiedBy: null
                 };
             }
         }

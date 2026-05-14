@@ -16,7 +16,7 @@ export function createProtagonistStatue(x, y, tileX, tileY, spriteType) {
         sprite: {
             type: spriteType,
             anchor: { x: 0.5, y: 0.75},
-            size: { w: 64, h: 82 } //primera estructura que tiene que ocupar 4x4 tiles, eso hay que adaptarlo para que ocupe ese espacio de verdad
+            size: { w: 64, h: 82 }
         },
 
         collider: {
@@ -24,14 +24,18 @@ export function createProtagonistStatue(x, y, tileX, tileY, spriteType) {
         },
 
         data: {
-            spriteType, //esto por si acaso, pero creo que no necesita nada más por ahora, a menos que para que ocupe 4x4 tiles haga falta darle alguna propiedad
+            spriteType,
 
             blockMovement: true,
             blockBuilding: true,
 
+            onlyOne: true,
+
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2)
+            occupiedTiles: createSpecialOccupiedTiles(2),
+
+            reservedBy: null
         }
     });
 }
@@ -50,7 +54,7 @@ export function createLogicianStatue(x, y, tileX, tileY, spriteType) {
         sprite: {
             type: spriteType,
             anchor: { x: 0.5, y: 0.75},
-            size: { w: 64, h: 82 } //primera estructura que tiene que ocupar 4x4 tiles, eso hay que adaptarlo para que ocupe ese espacio de verdad
+            size: { w: 64, h: 82 }
         },
 
         collider: {
@@ -58,14 +62,18 @@ export function createLogicianStatue(x, y, tileX, tileY, spriteType) {
         },
 
         data: {
-            spriteType, //esto por si acaso, pero creo que no necesita nada más por ahora, a menos que para que ocupe 4x4 tiles haga falta darle alguna propiedad
+            spriteType,
 
             blockMovement: true,
             blockBuilding: true,
 
+            onlyOne: true,
+
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2)
+            occupiedTiles: createSpecialOccupiedTiles(2),
+
+            reservedBy: null
         }
     });
 }
@@ -84,7 +92,7 @@ export function createLogisticianStatue(x, y, tileX, tileY, spriteType) {
         sprite: {
             type: spriteType,
             anchor: { x: 0.5, y: 0.75},
-            size: { w: 64, h: 82 } //primera estructura que tiene que ocupar 4x4 tiles, eso hay que adaptarlo para que ocupe ese espacio de verdad
+            size: { w: 64, h: 82 }
         },
 
         collider: {
@@ -92,14 +100,18 @@ export function createLogisticianStatue(x, y, tileX, tileY, spriteType) {
         },
 
         data: {
-            spriteType, //esto por si acaso, pero creo que no necesita nada más por ahora, a menos que para que ocupe 4x4 tiles haga falta darle alguna propiedad
+            spriteType,
 
             blockMovement: true,
             blockBuilding: true,
 
+            onlyOne: true,
+
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2)
+            occupiedTiles: createSpecialOccupiedTiles(2),
+
+            reservedBy: null
         }
     });
 }
@@ -118,7 +130,7 @@ export function createDefenderStatue(x, y, tileX, tileY, spriteType) {
         sprite: {
             type: spriteType,
             anchor: { x: 0.5, y: 0.75},
-            size: { w: 64, h: 82 } //primera estructura que tiene que ocupar 4x4 tiles, eso hay que adaptarlo para que ocupe ese espacio de verdad
+            size: { w: 64, h: 82 }
         },
 
         collider: {
@@ -126,14 +138,18 @@ export function createDefenderStatue(x, y, tileX, tileY, spriteType) {
         },
 
         data: {
-            spriteType, //esto por si acaso, pero creo que no necesita nada más por ahora, a menos que para que ocupe 4x4 tiles haga falta darle alguna propiedad
+            spriteType,
 
             blockMovement: true,
             blockBuilding: true,
 
+            onlyOne: true,
+
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2)
+            occupiedTiles: createSpecialOccupiedTiles(2),
+
+            reservedBy: null
         }
     });
 }

@@ -3,7 +3,9 @@
 import AssetsManager from "../../assets/AssetsManager";
 import assetManifest from "../../assets/AssetsManifest.js";
 import gameStateA from "../../game/faceA/state/GameStateA.js";
+import gameStateB from "../../game/faceB/state/GameStateB.js";
 import gameState from "../../game/state/GameStateG.js";
+import { BUILDINGS } from "../../game/faceB/systems/BuildingsDefinition.js";
 
 class CanvasRenderer { //la clase que se va a meter en GameManager para asociarla al canvas de react sin mezclar trabajo de React con trabajo de la lógica
 
@@ -30,6 +32,15 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
             //update mouse position inside canvas
             this.onClick && this.onClick({ x, y });
+        });
+
+        this.canvas.addEventListener("mousemove", (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            this.onMouseMove && this.onMouseMove({ x, y });
         });
     }
 
@@ -105,6 +116,9 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
             }
         }
 
+        //shadow for emplacement
+        this.renderBuildPreview(ctx, worldState);
+
         //drawing scenograpghics
         const scenographicsSorted = [...worldState.scenographics].sort((a, b) => a.y - b.y);
         
@@ -170,7 +184,13 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         //drawing structures
         worldState.structures.forEach(structure => {
             if (structure.sprite) {
-                const img = AssetsManager.getImage(structure.sprite.type);
+
+                const spriteKey =
+                    structure.data.state === "emplacement"
+                        ? "emplacement"
+                        : structure.sprite.type;
+
+                const img = AssetsManager.getImage(spriteKey);
 
                 if (!img || !img.complete) return;
 
@@ -186,6 +206,37 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                     width,
                     height
                 );
+
+                const worker = worldState.entities.find(e =>
+                    e.type === "villager" &&
+                    e.data.actionTarget?.id === structure.id &&
+                    e.data.state === "building" &&
+                    e.data.path.length <= 0
+                );
+
+                const boostable =
+                    worker &&
+                    !gameState.selectedEntityId &&
+                    structure.data.state === "in_construction";
+
+                if (boostable) {
+                    const pulse = 0.7 + Math.sin(Date.now() * 0.01) * 0.3;
+
+                    ctx.save();
+
+                    ctx.translate(structure.x, structure.y);
+
+                    ctx.globalAlpha = pulse;
+
+                    ctx.strokeStyle = "rgba(255,255,120,0.9)";
+                    ctx.lineWidth = 3;
+
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 36, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.restore();
+                }
             }
         });
 
@@ -271,7 +322,12 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                             case "resource":
                                 scale *= 0.95;
                                 ctx.globalAlpha *= 0.6;
-                            break;
+                                break;
+
+                            case "reserved":
+                                ctx.globalAlpha *= 0.35;
+                                scale *= 0.9;
+                                break;
                         }
                     }
 
@@ -400,6 +456,99 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
             y - height * anchor.y - padding + lineWidth / 2,
             width + padding * 2 - lineWidth,
             height + padding * 2 - lineWidth
+        );
+
+        ctx.restore();
+    }
+
+    renderBuildPreview(ctx, worldState) {
+
+        if(!gameStateB.buildMode.active) return;
+
+        const {
+            hoverTileX,
+            hoverTileY,
+            canPlace,
+            buildingId
+        } = gameStateB.buildMode;
+
+        if (
+            hoverTileX === null ||
+            hoverTileY === null
+        ) {
+            return;
+        }
+
+        const definition = BUILDINGS.find(
+            b => b.id === buildingId
+        );
+
+        if (!definition) return;
+
+        const worldPos = worldState.grid.gridToWorld({
+            x: hoverTileX,
+            y: hoverTileY
+        });
+
+        //preview
+        const preview = definition.create(
+            worldPos.x,
+            worldPos.y,
+            hoverTileX,
+            hoverTileY,
+            definition,
+        );
+
+        const spriteKey =
+            preview.data.state === "emplacement" 
+                ? "emplacement" 
+                : preview.sprite.type;
+
+        const img = AssetsManager.getImage(spriteKey);
+
+        if(!img || !img.complete) return;
+
+        const width = preview.sprite.size?.w || 32;
+        const height = preview.sprite.size?.h || 32;
+
+        const anchor = preview.sprite.anchor || { x: 0.5, y: 0.5 };
+
+        ctx.save();
+
+        ctx.globalAlpha = 0.55;
+
+        ctx.drawImage(
+            img,
+            worldPos.x - width * anchor.x,
+            worldPos.y - height * anchor.y,
+            width,
+            height
+        );
+
+        //overlay color
+        ctx.fillStyle = canPlace
+            ? "rgba(80, 255, 120, 0.35)"
+            : "rgba(255, 80, 80, 0.35)";
+
+        ctx.fillRect(
+            worldPos.x - worldState.grid.cellSize / 2,
+            worldPos.y - worldState.grid.cellSize / 2,
+            worldState.grid.cellSize,
+            worldState.grid.cellSize
+        );
+
+        //border
+        ctx.strokeStyle = canPlace
+            ? "rgba(80, 255, 120, 0.9)"
+            : "rgba(255, 80, 80, 0.9)";
+
+        ctx.lineWidth = 2;
+
+        ctx.strokeRect(
+            worldPos.x - worldState.grid.cellSize / 2,
+            worldPos.y - worldState.grid.cellSize / 2,
+            worldState.grid.cellSize,
+            worldState.grid.cellSize
         );
 
         ctx.restore();

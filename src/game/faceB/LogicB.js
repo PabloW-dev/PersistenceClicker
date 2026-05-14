@@ -1,6 +1,6 @@
 // flujo de juego y funciones auxiliares de FaceB
 // Game flow and auxiliary functions of FaceB
-
+import worldState from "../world/WorldState";
 import gameState from "../state/GameStateG";
 import gameStateB from "./state/GameStateB";
 import { emit } from "../../utils/events";
@@ -295,5 +295,20 @@ export function getVillagerCost(worldState) {
 
     return Math.floor(
         BASE_COST * Math.pow(MULTIPLIER, villagers)
+    );
+}
+
+export function getBuildingCount(referenceId) {
+    return worldState.structures.filter(
+        s => s.data.referenceId === referenceId
+    ).length;
+}
+
+export function getScaledValue(baseValue, referenceId, multiplier = 1.4) {
+
+    const count = getBuildingCount(referenceId);
+
+    return Math.floor(
+        baseValue * Math.pow(multiplier, count)
     );
 }

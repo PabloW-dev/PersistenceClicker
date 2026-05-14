@@ -5,8 +5,21 @@ import { GroundMoveCost } from "../../game/world/Tile";
 
 const SPEED = 10;
 
+
+//TO DO: fix the pathfinding for can repath if there is a cell occupiedBy another entity
+
 export default function movementSystem(deltaTime) {
     const grid = worldState.grid;
+
+    for (let x = 0; x < grid.width; x++) {
+        for (let y = 0; y < grid.height; y++) {
+            const cell = grid.getCell(x, y);
+
+            if (cell) {
+                cell.occupiedBy = null;
+            }
+        }
+    }
 
     const tower = worldState.structures.find(s => s.type === "tower");
 
@@ -130,9 +143,24 @@ function handleEchoMovement(entity, grid, deltaTime, tower) {
 }
 
 function followPath(entity, grid, deltaTime) {
+    
     const path = entity.data.path;
 
     if (!path || path.length === 0) return;
+
+    const currentCell = grid.worldToGrid({
+        x: entity.x,
+        y: entity.y
+    });
+
+    const currentGridCell = grid.getCell(
+        currentCell.x,
+        currentCell.y
+    );
+
+    if (currentGridCell) {
+        currentGridCell.occupiedBy = entity.id;
+    }
 
     const index = entity.data.pathIndex ?? 0;
 
@@ -167,6 +195,35 @@ function followPath(entity, grid, deltaTime) {
 
         return;
     }
+
+    const nextCell = path[index];
+
+    const occupied = grid.getCell(nextCell.x, nextCell.y)?.occupiedBy;
+
+    if (occupied && occupied !== entity.id) {
+
+        entity.data.blockedTimer =
+            (entity.data.blockedTimer || 0) + deltaTime;
+
+        if (entity.data.blockedTimer >= 2) {
+
+            if (entity.data.actionTarget) {
+                entity.data.actionTarget.data.reservedBy = null;
+            }
+
+            entity.data.path = [];
+            entity.data.pathIndex = 0;
+            entity.data.actionTarget = null;
+            entity.data.actionType = null;
+            entity.data.state = "idle";
+
+            entity.data.blockedTimer = 0;
+        }
+
+        return;
+    }
+
+    entity.data.blockedTimer = 0;
 
     const next = grid.gridToWorld(path[index]);
 

@@ -47,7 +47,9 @@ export function createTree(x, y, tileX, tileY, species) {
             scale: 1,
             targetScale: 1,
             isPreErasing: false,
-            justChangedState: false
+            justChangedState: false,
+
+            reservedBy: null
         }
     })
 }
@@ -88,7 +90,9 @@ export function createRock(x, y, tileX, tileY, spriteType) { //las rocas y metal
             blockBuilding: true,
 
             hitflash: 0,
-            scale: 1
+            scale: 1,
+
+            reservedBy: null
         }
     })
 }
@@ -128,7 +132,9 @@ export function createRuin(x, y, tileX, tileY, spriteType) {
             blockMovement: true,
             blockBuilding: true,
 
-            scale: 1
+            scale: 1,
+
+            reservedBy: null
         }
     })
 }

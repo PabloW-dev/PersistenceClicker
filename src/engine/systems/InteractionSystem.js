@@ -7,16 +7,31 @@ import { restEXPCanvas, addEXPToCenterTown } from "../../game/faceB/LogicB.js";
 import { getEntityAtPosition } from "./ColliderSystem.js";
 import { findPath, getNearestResourceCell, isAtTargetCell } from "../../game/world/PathFinding.js";
 import gameStateA from "../../game/faceA/state/GameStateA.js";
+import gameStateB from "../../game/faceB/state/GameStateB.js";
 import gameState from "../../game/state/GameStateG.js";
+import { placeBuilding, cancelBuildMode } from "../../game/faceB/systems/ConstructionSystem.js";
 import { canBeSelected, canReceiveOrders } from "../../utils/entitiesState.js"
 import { emit } from "../../utils/events.js";
-import { POPULATION } from "../../game/faceB/systems/PopulationSystem.js";
+import { POPULATION } from "../../game/faceB/systems/PopulationSystem.js"; 
 
 function interactionSystem(worldPos, camera) {
 
     const selected = worldState.entities.find(
         e => e.id === gameState.selectedEntityId
     );
+
+    if (gameStateB.buildMode.active) {
+
+        const cell = worldState.grid.worldToGrid(worldPos);
+
+        if (gameStateB.buildMode.canPlace) {
+            placeBuilding(cell.x, cell.y);
+        } else {
+            cancelBuildMode();
+        }
+
+        return;
+    }
 
     // SCENOGRAPHIQUES
 
@@ -115,10 +130,26 @@ function interactionSystem(worldPos, camera) {
                 return;
             }
 
+            //Ocupado
+            if (scenographic.data.reservedBy && scenographic.data.reservedBy !== selected.id) {
+                selected.data.warningFlash = 1;
+                selected.data.warningType = "reserved";
+                return;
+            }
+
+            if (
+                selected.data.actionTarget &&
+                selected.data.actionTarget.id !== scenographic.id
+            ) {
+                selected.data.actionTarget.data.reservedBy = null;
+            }
+
             selected.data.actionType = "obtaining_resources";
             selected.data.actionTarget = scenographic;
             console.log(selected.data.actionTarget);
             selected.data.state = "moving";
+            scenographic.data.reservedBy = selected.id;
+            console.log(selected);
 
             const grid = worldState.grid;
 
@@ -138,12 +169,27 @@ function interactionSystem(worldPos, camera) {
                     return;
                 }
 
+                //ocupado
+                if (scenographic.data.reservedBy && scenographic.data.reservedBy !== selected.id) {
+                    selected.data.warningFlash = 1;
+                    selected.data.warningType = "reserved";
+                    return;
+                }
+
                 selected.data.path = [];
                 selected.data.pathIndex = 0;
+
+                if (
+                    selected.data.actionTarget &&
+                    selected.data.actionTarget.id !== scenographic.id
+                ) {
+                    selected.data.actionTarget.data.reservedBy = null;
+                }
 
                 selected.data.actionType = "obtaining_resources";
                 selected.data.actionTarget = scenographic;
                 selected.data.state = "obtaining_resources";
+                scenographic.data.reservedBy = selected.id;
 
                 if(scenographic.data?.yearsToErase) {
                     selected.data.hiddenInStructure = true;
@@ -156,13 +202,26 @@ function interactionSystem(worldPos, camera) {
                 return;
             }
 
-            selected.data.path = findPath(
+            const path = findPath(
                 start,
                 target,
                 grid
             );
 
+            if (!path || path.length <= 0) {
+
+                scenographic.data.reservedBy = null;
+
+                selected.data.actionTarget = null;
+                selected.data.actionType = null;
+                selected.data.state = "idle";
+
+                return;
+            }
+
+            selected.data.path = path;
             selected.data.pathIndex = 0;
+            gameState.selectedEntityId = null;
         }
 
         gameState.selectedEntityId = null;
@@ -189,6 +248,261 @@ function interactionSystem(worldPos, camera) {
 
             restEXPCanvas(worldPos, camera);
             addEXPToCenterTown(worldState);
+        }
+
+        const workingVillager = getWorkingVillagerForStructure(structure);
+
+        const hasSelection = !!selected;
+
+        if (
+            !hasSelection &&
+            workingVillager &&
+            gameState.currentExp > 0 &&
+            structure.data.state === "in_construction"
+        ) {
+
+            restEXPCanvas(worldPos, camera);
+            workingVillager.data.actionTimer += 1;
+
+            return;
+        }
+
+        if (structure.type === "structure" && !selected) {
+            
+            emit("openModal", {
+                type: "structure",
+                payload: {
+                    structureId: structure.id
+                }
+            });
+
+            return;
+        }
+
+        if (
+            selected &&
+            selected.type === "villager"
+        ) {
+
+            // ENERGÍA
+            if (selected.data.energy < 20) {
+                selected.data.warningFlash = 1;
+                selected.data.warningType = "energy";
+                return;
+            }
+
+            // HAMBRE
+            if (selected.data.food < 10) {
+                selected.data.warningFlash = 1;
+                selected.data.warningType = "food";
+                return;
+            }
+
+            // SED
+            if (selected.data.water < 10) {
+                selected.data.warningFlash = 1;
+                selected.data.warningType = "water";
+                return;
+            }
+
+            // PROFESIÓN INCORRECTA
+            if (!canDoJob(selected, scenographic)) {
+                selected.data.warningFlash = 1;
+                selected.data.warningType = "profession";
+                return;
+            }
+
+            //Ocupado
+            if (structure.data.reservedBy && structure.data.reservedBy !== selected.id) {
+                selected.data.warningFlash = 1;
+                selected.data.warningType = "reserved";
+                return;
+            }
+
+            if(structure.data.state === "emplacement") {
+                const requiredMaterials = Object.keys(structure.data.matsRequired);
+
+                const hasRequiredMaterials = requiredMaterials.some(
+                    material =>
+                        selected.data.inventory.items[material] > 0
+                    );
+
+                if (!hasRequiredMaterials) {
+                    selected.data.warningFlash = 1;
+                    selected.data.warningType = "inventory";
+                    return;
+                }
+
+                if (
+                    selected.data.actionTarget &&
+                    selected.data.actionTarget.id !== structure.id
+                ) {
+                    selected.data.actionTarget.data.reservedBy = null;
+                }
+
+
+                selected.data.actionType = "delivering_resources";
+                selected.data.actionTarget = structure;
+                selected.data.state = "moving";
+                console.log(selected);
+
+                structure.data.reservedBy = selected.id;
+
+                const grid = worldState.grid;
+
+                const start = grid.worldToGrid({
+                    x: selected.x,
+                    y: selected.y
+                });
+
+                const target = getNearestResourceCell(
+                    structure,
+                    start,
+                    grid
+                );
+
+                if (isAtTargetCell(selected, target, grid)) {
+                    if (!canDoJob(selected, structure)) {
+                        return;
+                    }
+
+                    //ocupado
+                    if (structure.data.reservedBy && structure.data.reservedBy !== selected.id) {
+                        selected.data.warningFlash = 1;
+                        selected.data.warningType = "reserved";
+                        return;
+                    }
+
+                    selected.data.path = [];
+                    selected.data.pathIndex = 0;
+
+                    if (
+                        selected.data.actionTarget &&
+                        selected.data.actionTarget.id !== structure.id
+                    ) {
+                        selected.data.actionTarget.data.reservedBy = null;
+                    }
+
+                    selected.data.actionType = "delivering_resources";
+                    selected.data.actionTarget = structure;
+                    selected.data.state = "delivering_resources";
+                    structure.data.reservedBy = selected.id;
+
+                    gameState.selectedEntityId = null;
+
+                    return;
+                }
+
+                const path = findPath(
+                    start,
+                    target,
+                    grid
+                );
+
+                if (!path || path.length <= 0) {
+
+                    structure.data.reservedBy = null;
+
+                    selected.data.actionTarget = null;
+                    selected.data.actionType = null;
+                    selected.data.state = "idle";
+
+                    return;
+                }
+
+                selected.data.path = path;
+                selected.data.pathIndex = 0;
+                gameState.selectedEntityId = null;
+
+                return;
+            }
+
+            if(structure.data.state === "in_construction") {
+                
+                
+                if (
+                    selected.data.actionTarget &&
+                    selected.data.actionTarget.id !== structure.id
+                ) {
+                    selected.data.actionTarget.data.reservedBy = null;
+                }
+
+
+                selected.data.actionType = "building";
+                selected.data.actionTarget = structure;
+                selected.data.state = "moving";
+                console.log(selected);
+
+                structure.data.reservedBy = selected.id;
+
+                const grid = worldState.grid;
+
+                const start = grid.worldToGrid({
+                    x: selected.x,
+                    y: selected.y
+                });
+
+                const target = getNearestResourceCell(
+                    structure,
+                    start,
+                    grid
+                );
+
+                if (isAtTargetCell(selected, target, grid)) {
+                    if (!canDoJob(selected, structure)) {
+                        return;
+                    }
+
+                    //ocupado
+                    if (structure.data.reservedBy && structure.data.reservedBy !== selected.id) {
+                        selected.data.warningFlash = 1;
+                        selected.data.warningType = "reserved";
+                        return;
+                    }
+
+                    selected.data.path = [];
+                    selected.data.pathIndex = 0;
+
+                    if (
+                        selected.data.actionTarget &&
+                        selected.data.actionTarget.id !== structure.id
+                    ) {
+                        selected.data.actionTarget.data.reservedBy = null;
+                    }
+
+                    selected.data.actionType = "building";
+                    selected.data.actionTarget = structure;
+                    selected.data.state = "building";
+                    structure.data.reservedBy = selected.id;
+
+                    gameState.selectedEntityId = null;
+
+                    return;
+                }
+
+                const path = findPath(
+                    start,
+                    target,
+                    grid
+                );
+
+                if (!path || path.length <= 0) {
+
+                    structure.data.reservedBy = null;
+
+                    selected.data.actionTarget = null;
+                    selected.data.actionType = null;
+                    selected.data.state = "idle";
+
+                    return;
+                }
+
+                selected.data.path = path;
+                selected.data.pathIndex = 0;
+                gameState.selectedEntityId = null;
+
+                return;
+            }
         }
 
         gameState.selectedEntityId = null;
@@ -240,6 +554,11 @@ function interactionSystem(worldPos, camera) {
         }
 
         if (selected.type === "villager") {
+
+            if (selected.data.actionTarget) {
+                selected.data.actionTarget.data.reservedBy = null;
+            }
+
             selected.data.actionTarget = null;
             selected.data.actionType = null;
             selected.data.hiddenInStructure = false;
@@ -267,6 +586,15 @@ function getWorkingVillagerForScenographic(scenographic) { //find the villager t
         entity.type === "villager" &&
         entity.data.actionTarget?.id === scenographic.id &&
         entity.data.path.length <= 0
+    );
+}
+
+function getWorkingVillagerForStructure(structure) {
+    return worldState.entities.find(entity =>
+        entity.type === "villager" &&
+        entity.data.actionTarget?.id === structure.id &&
+        entity.data.path.length <= 0 &&
+        entity.data.actionType === "building"
     );
 }
 

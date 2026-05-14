@@ -223,6 +223,10 @@ export default function decaySystem(deltaTime) {
         if (entity.data.hp <= 0) {
             villagerStatesManager(entity, "dead");
 
+            if (entity.data.actionTarget) {
+                entity.data.actionTarget.data.reservedBy = null;
+            }
+
             entity.data.path = [];
             entity.data.pathIndex = 0;
             entity.data.target = null;
