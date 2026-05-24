@@ -16,6 +16,7 @@ import { initSystemsB, runSystemsB } from "../../game/faceB/systems/SystemBManag
 import ExpSystem from "../systems/ExpSystem.js";
 import changeFace from "../scenes/SceneManager.js";
 import { updateBuildMode } from "../../game/faceB/systems/ConstructionSystem.js";
+import { influenceSystem } from "../systems/InfluenceSystem.js";
 
 
 let renderer = null;
@@ -86,6 +87,8 @@ function loop(deltaTime) {
         }
 
         updateGrid(clampedDelta);
+
+        influenceSystem(clampedDelta);
 
         renderer.render(worldState, camera, gameState.selectedEntityId);
     }

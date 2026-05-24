@@ -4,6 +4,7 @@ import gameState from "../../state/GameStateG";
 import worldState from "../../world/WorldState";
 import { canAct } from "../../../utils/entitiesState";
 import { startResurrectProcess } from "../LogicA";
+import { buildingsToGoRuin, BuildingToRuin } from "../../shared/Decay";
 
 const MAX_CHASE_DISTANCE = 200;
 
@@ -201,10 +202,10 @@ function findTarget(entity, entities, structures) {
         if (!other.data || other.data.hp == null) continue;
 
         // enemigos no atacan enemigos, sombras ni portales
-        if (isEnemy && (other.type === "enemy" || other.type === "shadow" || other.type === "portal")) continue;
+        if (isEnemy && (other.type === "enemy" || other.type === "shadow" || other.type === "portal" || other.type === "resource" || other.type === "special")) continue;
 
         // archetypes no atacan aliados
-        if (isArchetype && (other.type === "tower" || other.type === "archetype" || other.type === "friendStructure")) continue;
+        if (isArchetype && (other.type === "tower" || other.type === "archetype" || other.type === "structure" || other.type === "resource" || other.type === "special")) continue;
 
         const dx = other.x - entity.x;
         const dy = other.y - entity.y;
@@ -240,6 +241,16 @@ function handleDeath(entity) {
         cancelProcessesByArchetype(entity.data.archetypeId);
 
         startResurrectProcess(entity);
+
+        return;
+    }
+
+    if (entity.type === "structure") {
+        if (!buildingsToGoRuin.some(b => b.id === entity.id)) {
+            buildingsToGoRuin.push(entity);
+        }
+
+        BuildingToRuin();
 
         return;
     }

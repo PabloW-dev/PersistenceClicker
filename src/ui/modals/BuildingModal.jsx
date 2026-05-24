@@ -20,12 +20,17 @@ export default function BuildingModal({ structureId }) {
         className="modal-content"
         onMouseDown={(e) => e.stopPropagation()}
     >
-      <p>HP: {structure.data.hp} / {structure.data.hpMax}</p>
-      <p>Years: {structure.data.years} / {structure.data.yearsToRuin}</p>
-      <p>Use: {structure.data.actionClick}</p>
-      <p>
-        Inside: {entity?.data?.name || (entity ? "Villager" : "Nobody")}
-      </p>
+      <p>{structure.data.referenceId}</p>
+      <p>HP: {structure.data.hp.toFixed(0)} / {structure.data.hpMax}</p>
+      <p>Use: {structure.type === "structure"
+                ? structure.data.actionDescription
+                : "Special"}</p>
+      {structure.type === "structure"
+      ? (
+        <p>
+          Inside: {entity?.data?.name || (entity ? "Villager" : "Nobody")}
+        </p>)
+      : (<></>)}
       {structure.data.state === "emplacement" && (
         <div>
           <p>Required materials:</p>
@@ -36,6 +41,32 @@ export default function BuildingModal({ structureId }) {
           }
         </div>
       )}
+      {structure.data.storage
+      ? (<div>
+          <button
+            className="modal-button"
+            onClick={() => {
+              structure.data.storage.mode =
+                structure.data.storage.mode === "deposit"
+                  ? "withdraw"
+                  : "deposit";
+            }}
+          >
+            Switch to {
+              structure.data.storage.mode === "deposit"
+                ? "Withdraw"
+                : "Deposit"
+            }
+          </button>
+
+          <p>Storage materials: {
+            Object.keys(structure.data.storage.items).length > 0
+              ? JSON.stringify(structure.data.storage.items)
+              : "Empty"
+            }
+          </p>
+        </div>)
+      : (<></>)}
     </div>
   )
 }

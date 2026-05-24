@@ -13,6 +13,7 @@ import { placeBuilding, cancelBuildMode } from "../../game/faceB/systems/Constru
 import { canBeSelected, canReceiveOrders } from "../../utils/entitiesState.js"
 import { emit } from "../../utils/events.js";
 import { POPULATION } from "../../game/faceB/systems/PopulationSystem.js"; 
+import { STRUCTURE_ACTIONS } from "../../game/faceB/systems/UseBuildingData.js";
 
 function interactionSystem(worldPos, camera) {
 
@@ -257,17 +258,23 @@ function interactionSystem(worldPos, camera) {
         if (
             !hasSelection &&
             workingVillager &&
-            gameState.currentExp > 0 &&
-            structure.data.state === "in_construction"
+            gameState.currentExp > 0
         ) {
 
             restEXPCanvas(worldPos, camera);
-            workingVillager.data.actionTimer += 1;
+
+            if(structure.data.state === "in_construction") {
+                workingVillager.data.actionTimer += 1;
+            }
+
+            if(structure.data.state === "build") {
+                workingVillager.data.hiddenTimer += 1;
+            }
 
             return;
         }
 
-        if (structure.type === "structure" && !selected) {
+        if ((structure.type === "special" || structure.type === "structure") && !selected) {
             
             emit("openModal", {
                 type: "structure",
@@ -283,30 +290,37 @@ function interactionSystem(worldPos, camera) {
             selected &&
             selected.type === "villager"
         ) {
+            const freeActions = [
+                "rest",
+                "eat",
+                "drink"
+            ];
+
+            const isFreeAction = freeActions.includes(structure.data.actionClick);
 
             // ENERGÍA
-            if (selected.data.energy < 20) {
+            if (!isFreeAction && selected.data.energy < 20) {
                 selected.data.warningFlash = 1;
                 selected.data.warningType = "energy";
                 return;
             }
 
             // HAMBRE
-            if (selected.data.food < 10) {
+            if (!isFreeAction && selected.data.food < 10) {
                 selected.data.warningFlash = 1;
                 selected.data.warningType = "food";
                 return;
             }
 
             // SED
-            if (selected.data.water < 10) {
+            if (!isFreeAction && selected.data.water < 10) {
                 selected.data.warningFlash = 1;
                 selected.data.warningType = "water";
                 return;
             }
 
             // PROFESIÓN INCORRECTA
-            if (!canDoJob(selected, scenographic)) {
+            if (!canDoJob(selected, structure)) {
                 selected.data.warningFlash = 1;
                 selected.data.warningType = "profession";
                 return;
@@ -344,7 +358,6 @@ function interactionSystem(worldPos, camera) {
                 selected.data.actionType = "delivering_resources";
                 selected.data.actionTarget = structure;
                 selected.data.state = "moving";
-                console.log(selected);
 
                 structure.data.reservedBy = selected.id;
 
@@ -431,7 +444,6 @@ function interactionSystem(worldPos, camera) {
                 selected.data.actionType = "building";
                 selected.data.actionTarget = structure;
                 selected.data.state = "moving";
-                console.log(selected);
 
                 structure.data.reservedBy = selected.id;
 
@@ -499,6 +511,101 @@ function interactionSystem(worldPos, camera) {
 
                 selected.data.path = path;
                 selected.data.pathIndex = 0;
+                gameState.selectedEntityId = null;
+
+                return;
+            }
+
+            if(structure.data.state === "build") {
+
+                if (
+                    selected.data.actionTarget &&
+                    selected.data.actionTarget.id !== structure.id
+                ) {
+                    selected.data.actionTarget.data.reservedBy = null;
+                }
+
+                const action =
+                    STRUCTURE_ACTIONS[structure.data.actionClick];
+
+                if (!action) return;
+
+                action(selected, structure);
+
+
+                //selected.data.hiddenInStructure = true;
+                //selected.collider.radius = 0;
+                selected.data.hiddenTimer = 0;
+
+                structure.data.reservedBy = selected.id;
+
+                const grid = worldState.grid;
+
+                const start = grid.worldToGrid({
+                    x: selected.x,
+                    y: selected.y
+                });
+
+                const target = getNearestResourceCell(
+                    structure,
+                    start,
+                    grid
+                );
+
+                if (isAtTargetCell(selected, target, grid)) {
+                    if (!canDoJob(selected, structure)) {
+                        return;
+                    }
+
+                    //ocupado
+                    if (structure.data.reservedBy && structure.data.reservedBy !== selected.id) {
+                        selected.data.warningFlash = 1;
+                        selected.data.warningType = "reserved";
+                        return;
+                    }
+
+                    selected.data.path = [];
+                    selected.data.pathIndex = 0;
+
+                    if (
+                        selected.data.actionTarget &&
+                        selected.data.actionTarget.id !== structure.id
+                    ) {
+                        selected.data.actionTarget.data.reservedBy = null;
+                    }
+
+                    action(selected, structure);
+
+                    //selected.data.hiddenInStructure = true;
+                    //selected.collider.radius = 0;
+                    selected.data.hiddenTimer = 0;
+
+                    structure.data.reservedBy = selected.id;
+
+                    gameState.selectedEntityId = null;
+
+                    return;
+                }
+
+                const path = findPath(
+                    start,
+                    target,
+                    grid
+                );
+
+                if (!path || path.length <= 0) {
+                    structure.data.reservedBy = null;
+
+                    selected.data.actionTarget = null;
+                    selected.data.actionType = null;
+                    selected.data.state = "idle";
+
+                    return;
+                }
+
+                selected.data.path = path;
+                selected.data.pathIndex = 0;
+
                 gameState.selectedEntityId = null;
 
                 return;
@@ -593,12 +700,23 @@ function getWorkingVillagerForStructure(structure) {
     return worldState.entities.find(entity =>
         entity.type === "villager" &&
         entity.data.actionTarget?.id === structure.id &&
-        entity.data.path.length <= 0 &&
-        entity.data.actionType === "building"
+        entity.data.path.length <= 0
     );
 }
 
-function canDoJob(villager, scenographic) {
+function canDoJob(villager, target) {
+    const freeActions = [
+        "rest",
+        "eat",
+        "drink"
+    ];
+
+    if (
+        target?.data?.actionClick &&
+        freeActions.includes(target.data.actionClick)
+    ) {
+        return true;
+    }
 
     const profession = villager.data.profession;
 
@@ -608,7 +726,7 @@ function canDoJob(villager, scenographic) {
     // WOODS
     if (
         profession === "woodcutter" &&
-        scenographic.data?.yearsForRebirth
+        target.data?.yearsForRebirth
     ) {
         return true;
     }
@@ -616,7 +734,7 @@ function canDoJob(villager, scenographic) {
     // ROCKS
     if (
         profession === "stonecutter" &&
-        scenographic.data?.yearsForRegenerate
+        target.data?.yearsForRegenerate
     ) {
         return true;
     }
@@ -624,7 +742,23 @@ function canDoJob(villager, scenographic) {
     // RUINS
     if (
         profession === "scavenger" &&
-        scenographic.data?.yearsToErase
+        target.data?.yearsToErase
+    ) {
+        return true;
+    }
+
+    // DELIVERER
+    if (
+        profession === "deliverer" &&
+        (target.data.state === "emplacement" || target.data.actionClick === "store")
+    ) {
+        return true;
+    }
+
+    // BUILDER
+    if (
+        profession === "builder" &&
+        target.data.state === "in_construction"
     ) {
         return true;
     }

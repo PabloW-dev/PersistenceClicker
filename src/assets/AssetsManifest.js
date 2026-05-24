@@ -68,6 +68,12 @@ import emplacement from "./sprites/Emplacement.png";
 import villagerHouse from "./sprites/villagerHouse.png";
 import villagerHouseInConstruction from "./sprites/villagerHouseInConstruction.png";
 
+import silo from "./sprites/silo.png";
+import siloInConstruction from "./sprites/siloInConstruction.png";
+
+import sundial from "./sprites/sundial.png";
+import sundialInConstruction from "./sprites/sundialInConstruction.png";
+
 const assetManifest = {
     backgroundA: backgroundA,
 
@@ -129,7 +135,13 @@ const assetManifest = {
     emplacement,
 
     villagerHouse,
-    villagerHouseInConstruction
+    villagerHouseInConstruction,
+
+    silo,
+    siloInConstruction,
+
+    sundial,
+    sundialInConstruction
 };
 
 export default assetManifest;

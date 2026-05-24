@@ -1,4 +1,4 @@
-# deploy automático para más tarde para producción, habrá que quitar la raíz de public para dejar de usar vite cuando toque o crashea todo
+# deploy automático para más tarde para producción
 
 #name: Deploy to Github Pages
 

@@ -304,11 +304,22 @@ export function getBuildingCount(referenceId) {
     ).length;
 }
 
-export function getScaledValue(baseValue, referenceId, multiplier = 1.4) {
+export function getScaledValue(baseValue, referenceId, multiplier = 1.2) {
 
     const count = getBuildingCount(referenceId);
 
     return Math.floor(
         baseValue * Math.pow(multiplier, count)
     );
+}
+
+export function getMaxPopulation(baseValue, referenceId, plus = 5) {
+
+    const count = worldState.structures.filter(
+        s =>
+            s.data.referenceId === referenceId &&
+            s.data.state === "build"
+    ).length;
+
+    return baseValue + count * plus;
 }

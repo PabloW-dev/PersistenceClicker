@@ -1,10 +1,18 @@
 //top of population
 import worldState from "../../world/WorldState";
+import { getMaxPopulation } from "../LogicB";
+
+//TO DO: las casas suman máxmimo de villagers
 
 export const POPULATION = {
     villagers: {
         maxPopulation: 200,
-        currentMaxPopulation: 5,
+        getCurrentMax: () => {
+            return getMaxPopulation(
+                5,
+                "villagerHouse"
+            )
+        },
         currentPopulation: 0,
         topPopulation: false
     },
@@ -26,5 +34,5 @@ export function populationSystem() {
 
     //marcar que se ha alcanzado el límite de población actual
     POPULATION.villagers.topPopulation =
-    villagers >= POPULATION.villagers.currentMaxPopulation;
+    villagers >= POPULATION.villagers.getCurrentMax();
 }

@@ -1,6 +1,57 @@
 //Creators for special Buildings
 import Entity from "../../shared/Entity";
 
+//TO DO: arreglar el overlay que va a molestar para las estatuas
+
+export function createSundial(x, y, tileX,tileY, spriteType, matsRequired) {
+    return new Entity({
+        id: "sundial",
+        x,
+        y,
+
+        tileX,
+        tileY,
+
+        type: "special",
+
+        sprite: {
+            type: spriteType,
+            anchor: { x: 0.25, y: 0.25 },
+            size: { w: 64, h: 64 }
+        },
+
+        collider: {
+            radius: 30
+        },
+
+        data: {
+            referenceId: "sundial",
+
+            hp: 1,
+            hpMax: 250,
+
+            spriteType,
+
+            blockMovement: true,
+            blockBuilding: true,
+
+            onlyOne: true,
+
+            scale: 1,
+
+            state: "ghost",
+            tileTypeForEmplacement: ["centerRing"],
+
+            matsRequired,
+
+            buildProgress: 0,
+            buildTime: 30,
+
+            occupiedTiles: createSpecialOccupiedTiles(2)
+        }
+    })
+}
+
 
 export function createProtagonistStatue(x, y, tileX, tileY, spriteType) {
     return new Entity({
@@ -33,9 +84,7 @@ export function createProtagonistStatue(x, y, tileX, tileY, spriteType) {
 
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2),
-
-            reservedBy: null
+            occupiedTiles: createSpecialOccupiedTiles(2)
         }
     });
 }
@@ -71,9 +120,7 @@ export function createLogicianStatue(x, y, tileX, tileY, spriteType) {
 
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2),
-
-            reservedBy: null
+            occupiedTiles: createSpecialOccupiedTiles(2)
         }
     });
 }
@@ -109,9 +156,7 @@ export function createLogisticianStatue(x, y, tileX, tileY, spriteType) {
 
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2),
-
-            reservedBy: null
+            occupiedTiles: createSpecialOccupiedTiles(2)
         }
     });
 }
@@ -147,14 +192,12 @@ export function createDefenderStatue(x, y, tileX, tileY, spriteType) {
 
             scale: 1,
 
-            occupiedTiles: createSpecialOccupiedTiles(2),
-
-            reservedBy: null
+            occupiedTiles: createSpecialOccupiedTiles(2)
         }
     });
 }
 
-function createSpecialOccupiedTiles(size) {
+export function createSpecialOccupiedTiles(size) {
     const tiles = [];
 
     for (let y = 0; y < size; y++) {

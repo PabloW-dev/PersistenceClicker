@@ -134,7 +134,38 @@ export function createRuin(x, y, tileX, tileY, spriteType) {
 
             scale: 1,
 
-            reservedBy: null
+            reservedBy: null,
+
+            //For A:
+            pauseTimer: 10,
         }
     })
 }
+
+//TO DO: para que las ruinas en A sólo hagan que los enemigos se paren unos segundos ante ellas, como si las estuviesen trepando
+
+//function canCrossRuin(entity, tile) {
+//    if (gameState.currentFace !== "A") return false;
+//
+//    const structure =
+//        worldState.scenographics.find(
+//            s => s.id === tile.structureId
+//        );
+//
+//    if (!structure) return false;
+//
+//    return structure.data?.yearsToErase;
+//}
+
+//Y luego en movement:
+
+//if (blockedByRuin) {
+//
+//    entity.data.ruinPauseTimer -= deltaTime;
+//
+//    if(entity.data.ruinPauseTimer > 0) {
+//        return;
+//    }
+//
+//    entity.data.ruinPauseTimer = structure.data.pauseTimer;
+//}

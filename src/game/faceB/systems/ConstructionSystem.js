@@ -2,12 +2,16 @@
 import worldState from "../../world/WorldState";
 import gameState from "../../state/GameStateG";
 import gameStateB from "../state/GameStateB";
-import { BUILDINGS } from "./BuildingsDefinition";
+import { BUILDABLES } from "./BuildingsDefinition";
 
+
+//TO DO: caminos
+//TO DO: lógica para borrar edificios, la pala. sacar lo que cuesta borrar del edificio, así incrementa también a través del edificio llegando al count
+//TO DO: reparar edificio -> otro botón y otro modo, si no resulta imposible separarlo de usar edificio
 
 export function canShowButton(buildingId) {
 
-    const building = BUILDINGS.find(b => b.id === buildingId);
+    const building = BUILDABLES.find(b => b.id === buildingId);
     
     if(!building) return false;
 
@@ -16,7 +20,7 @@ export function canShowButton(buildingId) {
 
 export function canBeBuild(buildingId) {
 
-    const building = BUILDINGS.find(b => b.id === buildingId);
+    const building = BUILDABLES.find(b => b.id === buildingId);
     
     if(!building) return false;
 
@@ -27,11 +31,14 @@ export function startBuildingMode(buildingId) {
 
     if (!canBeBuild(buildingId)) return false; //este check parece redundante en cuanto a gameplay pero nos libra de problemas de lógica interna
 
-    const building = BUILDINGS.find(b => b.id === buildingId);
+    const building = BUILDABLES.find(b => b.id === buildingId);
 
-    
 
     if (!building) return false;
+
+    if (worldState.structures.filter(
+        s => s.data.referenceId === buildingId
+    ).length >= building.maxInWorld) return false;
 
     //cancelar cualquier selección en el canvas que pudiese haber en el momento de darle al botón
     gameState.selectedEntityId = null;
@@ -58,7 +65,7 @@ export function canPlaceBuilding(tileX, tileY) {
 
     const buildMode = gameStateB.buildMode;
 
-    const definition = BUILDINGS.find(b => b.id === buildMode.buildingId); //porque se lo hemos pasado al hacer click en el botón ;)
+    const definition = BUILDABLES.find(b => b.id === buildMode.buildingId); //porque se lo hemos pasado al hacer click en el botón ;)
 
     if(!definition) return false;
 
@@ -92,6 +99,26 @@ export function canPlaceBuilding(tileX, tileY) {
         return false;
     }
 
+    //tamaño adecuado
+    for (const offset of previewBuilding.data.occupiedTiles) {
+        const checkTile = worldState.tileMap.getTile(
+            tileX + offset.x,
+            tileY + offset.y
+        );
+
+        if (!checkTile) return false;
+
+        if (checkTile.structureId) return false;
+
+        if (
+            !previewBuilding.data.tileTypeForEmplacement.includes(
+                checkTile.groundType
+            )
+        ) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -114,7 +141,7 @@ export function placeBuilding(tileX, tileY) {
         return false;
     }
 
-    const definition = BUILDINGS.find(
+    const definition = BUILDABLES.find(
         b => b.id === gameStateB.buildMode.buildingId
     );
 
@@ -135,6 +162,17 @@ export function placeBuilding(tileX, tileY) {
         tileY,
         definition,
     );
+
+    for (const offset of building.data.occupiedTiles) {
+        const occupiedTile = worldState.tileMap.getTile(
+            tileX + offset.x,
+            tileY + offset.y
+        );
+
+        if (occupiedTile) {
+            occupiedTile.structureId = building.id;
+        }
+    }
 
     //EXP
     gameState.currentExp -= definition.getCost();

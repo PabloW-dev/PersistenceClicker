@@ -1,17 +1,20 @@
 //degradation of the world, only runs when B, because A is "atemporal" (good excuse xd)
 //this cycle expend a 1 REAL day inside of B, so will needs persistance of the data
 import worldState from "../../world/WorldState";
+import { BuildingToRuin } from "../../shared/Decay";
 import { TreeStatesManager } from "./MachineStatesB";
 import { villagerStatesManager } from "./MachineStatesB";
+import { buildingsToGoRuin } from "../../shared/Decay";
 
 const AGE_SPEED = 100 / 86400;
 const AGE_SPEED_VILLAGER = 100 / 259200;
-const AGE_SPEED_ROCKS = 100 / 432.000;
+const AGE_SPEED_ROCKS = 100 / 432000;
 const THRIST = 100 / 7200;
 const HUNGRY = 100 / 14400;
 const STARVATION = 100 / 3600;
 const DEHYDRATION = 100 / 900;
 const EXHAUSTION = 100 / 1800;
+const AGE_TO_RUIN = 100 / 432000;
 
 export default function decaySystem(deltaTime) {
     const ruinTypes = new Set([
@@ -24,6 +27,7 @@ export default function decaySystem(deltaTime) {
     const villagersToRemove = [];
     const treesToRemove = [];
 
+    //TREES
     for (const scenographique of worldState.scenographics) {
         
         if (scenographique.data.age === undefined) continue; //because we wants 0 for the count
@@ -119,6 +123,7 @@ export default function decaySystem(deltaTime) {
             );
     }
 
+    //ROCKS AND METAL
     for (const scenographique of worldState.scenographics) {
 
         if (
@@ -161,6 +166,7 @@ export default function decaySystem(deltaTime) {
         }
     }
 
+    //RUINS
     for (const scenographique of worldState.scenographics) {
 
         if (!ruinTypes.has(scenographique.data.spriteType)) continue;
@@ -189,6 +195,7 @@ export default function decaySystem(deltaTime) {
             );
     }
 
+    //VILLAGERS
     for (const entity of worldState.entities) {
 
         if (entity.type !== "villager") continue; //simply check for take only the villgers
@@ -258,5 +265,25 @@ export default function decaySystem(deltaTime) {
         worldState.entities = worldState.entities.filter(
                 e => !villagersToRemove.includes(e.id)
             );
-    }    
+    }   
+
+    //BUILDINGS:
+    for (const structure of worldState.structures) {
+
+        if(structure.type !== "structure") continue;
+        if(structure.data.state !== "build") continue; //because we dont want the structure erased before build, indeed? ;)
+
+        //decay:
+        structure.data.hp = Math.max( //clamp para que no baje de 0 (no sé si hace falta)
+            0,
+            structure.data.hp - deltaTime * AGE_TO_RUIN
+        );
+
+        //pasa a ruin por hp <= 0
+        if (structure.data.hp <= 0) {
+            buildingsToGoRuin.push(structure);
+        }
+    }
+
+    BuildingToRuin();
 }

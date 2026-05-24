@@ -4,9 +4,10 @@ import worldState from "../../world/WorldState";
 import { TreeStatesManager } from "./MachineStatesB";
 import { professionSystem } from "./ProfessionSystem";
 import { updateInventorySpace } from "../../../utils/inventory";
-import { BUILDINGS } from "./BuildingsDefinition";
+import { BUILDABLES } from "./BuildingsDefinition";
 
 //TO DO: en delivering, la parte de que si el villager no tiene los materiales encima vaya a buscarlos al almacén más cercano, y ya, porque el click en el almacén directamente resulta para depositar resources
+//TO DO: amaestrar y los medusines
 
 export function productionSystem(deltaTime) {
 
@@ -177,69 +178,176 @@ export function productionSystem(deltaTime) {
                 continue;
             }
 
-            const requiredMaterials = structure.data.matsRequired;
+            if(entity.data.actionTarget.data.state === "emplacement") {
+                const requiredMaterials = structure.data.matsRequired;
 
-            const inventory = entity.data.inventory.items;
+                const inventory = entity.data.inventory.items;
 
-            for (const material in requiredMaterials) {
+                for (const material in requiredMaterials) {
 
-                //no hace falta más de este
-                if(requiredMaterials[material] <= 0) {
-                    continue;
+                    //no hace falta más de este
+                    if(requiredMaterials[material] <= 0) {
+                        continue;
+                    }
+
+                    //al aldeano no le queda o no tiene
+                    if(!inventory[material]) {
+                        continue;
+                    }
+
+                    const needed = requiredMaterials[material];
+                    const available = inventory[material];
+
+                    const amountToDeposit = Math.min(
+                        needed,
+                        available
+                    );
+
+                    inventory[material] -= amountToDeposit;
+                    requiredMaterials[material] -= amountToDeposit;
+
+                    updateInventorySpace(entity);
+
+                    entity.data.actionFlash = 1;
+
+                    professionSystem(entity, "deliverer", amountToDeposit);
+
+                    //limpiar slots vacíos
+                    if(inventory[material] <= 0) {
+                        delete inventory[material];
+                    }
                 }
 
-                //al aldeano no le queda o no tiene
-                if(!inventory[material]) {
-                    continue;
+                //comprobar si ya tiene todos los materiales
+                const completed = Object.values(requiredMaterials).every(a => a <= 0);
+
+                const referenceSprite = BUILDABLES.find(b => b.id === structure.data.referenceId);
+                
+                if (!referenceSprite) continue;
+
+                if(completed) {
+                    structure.data.state = "in_construction";
+                    structure.sprite.type = referenceSprite.spriteInConstruction;
                 }
 
-                const needed = requiredMaterials[material];
-                const available = inventory[material];
+                //terminar tarea
+                structure.data.reservedBy = null;
 
-                const amountToDeposit = Math.min(
-                    needed,
-                    available
-                );
+                entity.data.actionTarget = null;
+                entity.data.actionType = null;
+                entity.data.state = "idle";
+                entity.data.path = [];
+                entity.data.pathIndex = 0;
 
-                inventory[material] -= amountToDeposit;
-                requiredMaterials[material] -= amountToDeposit;
+                continue;
+            } else if (entity.data.actionTarget.data.state === "build") {
+                if(structure.data.referenceId === "silo") {
+                    const maxStorage = structure.data.storage.capacity;
+                    const inventory = entity.data.inventory.items;
+                    const storage = structure.data.storage.items;
+                    
+                    if(structure.data.storage.mode === "deposit") {
+                        for (const material in inventory) {
+                            if(inventory[material] <= 0) { //no sacar más de ahí
+                                continue;
+                            }
 
-                updateInventorySpace(entity);
+                            const currentStorage = Object.values(storage).reduce((sum, amount) => sum + amount, 0);
 
-                entity.data.actionFlash = 1;
+                            if(currentStorage >= maxStorage) continue;
 
-                professionSystem(entity, "deliverer", amountToDeposit);
+                            if(!storage[material]) {
+                                storage[material] = 0;
+                            }
 
-                //limpiar slots vacíos
-                if(inventory[material] <= 0) {
-                    delete inventory[material];
+                            const freeStorage = maxStorage - currentStorage;
+
+                            const amount = Math.min(
+                                inventory[material],
+                                freeStorage
+                            );
+
+                            storage[material] += amount;
+                            inventory[material] -= amount;
+
+                            updateInventorySpace(entity);
+                            updateInventorySpace(structure);
+
+                            entity.data.actionFlash = 1;
+
+                            professionSystem(entity, "deliverer", amount);
+
+                            if(inventory[material] <= 0) {
+                                delete inventory[material];
+                            }
+                        }
+
+                        structure.data.reservedBy = null;
+
+                        entity.data.actionTarget = null;
+                        entity.data.actionType = null;
+                        entity.data.state = "idle";
+                        entity.data.path = [];
+                        entity.data.pathIndex = 0;
+
+                        continue;
+                    } else { //uso else porque se entiende que si no resulta deposit resultará withdraw
+                        for (const material in storage) {
+                            if(storage[material] <= 0) { //no sacar más de ahí
+                                continue;
+                            }
+
+                            const currentStorage = Object.values(storage)
+                                .reduce((sum, amount) => sum + amount, 0);
+
+                            if(currentStorage <= 0) continue;
+
+                            if(!inventory[material]) {
+                                inventory[material] = 0;
+                            }
+
+                            const currentInventory = Object.values(inventory)
+                                .reduce((sum, amount) => sum + amount, 0);
+
+                            const freeSpace = Math.max(
+                                0,
+                                entity.data.inventory.carryCapacity - currentInventory
+                            );
+
+                            if(freeSpace <= 0) continue;
+
+                            const amount = Math.min(
+                                storage[material],
+                                freeSpace
+                            );
+
+                            inventory[material] += amount;
+                            storage[material] -= amount;
+
+                            updateInventorySpace(entity);
+                            updateInventorySpace(structure);
+
+                            entity.data.actionFlash = 1;
+
+                            professionSystem(entity, "deliverer", amount);
+
+                            if(storage[material] <= 0) {
+                                delete storage[material];
+                            }
+                        }
+
+                        structure.data.reservedBy = null;
+
+                        entity.data.actionTarget = null;
+                        entity.data.actionType = null;
+                        entity.data.state = "idle";
+                        entity.data.path = [];
+                        entity.data.pathIndex = 0;
+
+                        continue;
+                    }
                 }
-
-                break;
             }
-
-            //comprobar si ya tiene todos los materiales
-            const completed = Object.values(requiredMaterials).every(a => a <= 0);
-
-            const referenceSprite = BUILDINGS.find(b => b.id === structure.data.referenceId);
-            
-            if (!referenceSprite) continue;
-
-            if(completed) {
-                structure.data.state = "in_construction";
-                structure.sprite.type = referenceSprite.spriteInConstruction;
-            }
-
-            //terminar tarea
-            structure.data.reservedBy = null;
-
-            entity.data.actionTarget = null;
-            entity.data.actionType = null;
-            entity.data.state = "idle";
-            entity.data.path = [];
-            entity.data.pathIndex = 0;
-
-            continue;
         }
 
         //BUILDING
@@ -299,7 +407,7 @@ export function productionSystem(deltaTime) {
                 entity.data.actionTimer = 0;
             }
 
-            const referenceSprite = BUILDINGS.find(b => b.id === structure.data.referenceId);
+            const referenceSprite = BUILDABLES.find(b => b.id === structure.data.referenceId);
             
             if (!referenceSprite) continue;
 
@@ -307,6 +415,7 @@ export function productionSystem(deltaTime) {
             if(structure.data.hp >= structure.data.hpMax) {
                 structure.data.state = "build";
                 structure.sprite.type = referenceSprite.spriteType;
+                structure.data.hp = structure.data.hpMax; //clamp para que no tenga más vida que la máxima
 
                 //terminar tarea
                 structure.data.reservedBy = null;

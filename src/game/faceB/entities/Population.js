@@ -2,6 +2,8 @@
 import { randomRate, randomInt } from "../../../utils/math";
 import Entity from "../../shared/Entity";
 
+//TO DO: medusines (createEchoVillager) (y la job de amaestrar)
+
 export function createVillager(x, y, spriteType) {
     const baseCarryCapacity = randomInt(8, 16); 
     const baseActionCooldown = randomInt(4, 6);

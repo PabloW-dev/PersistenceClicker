@@ -5,7 +5,7 @@ import assetManifest from "../../assets/AssetsManifest.js";
 import gameStateA from "../../game/faceA/state/GameStateA.js";
 import gameStateB from "../../game/faceB/state/GameStateB.js";
 import gameState from "../../game/state/GameStateG.js";
-import { BUILDINGS } from "../../game/faceB/systems/BuildingsDefinition.js";
+import { BUILDABLES } from "../../game/faceB/systems/BuildingsDefinition.js";
 
 class CanvasRenderer { //la clase que se va a meter en GameManager para asociarla al canvas de react sin mezclar trabajo de React con trabajo de la lógica
 
@@ -210,14 +210,14 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                 const worker = worldState.entities.find(e =>
                     e.type === "villager" &&
                     e.data.actionTarget?.id === structure.id &&
-                    e.data.state === "building" &&
                     e.data.path.length <= 0
                 );
 
                 const boostable =
                     worker &&
                     !gameState.selectedEntityId &&
-                    structure.data.state === "in_construction";
+                    (structure.data.state === "in_construction" ||
+                    structure.data.state === "build");
 
                 if (boostable) {
                     const pulse = 0.7 + Math.sin(Date.now() * 0.01) * 0.3;
@@ -479,7 +479,7 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
             return;
         }
 
-        const definition = BUILDINGS.find(
+        const definition = BUILDABLES.find(
             b => b.id === buildingId
         );
 
@@ -530,13 +530,6 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
             ? "rgba(80, 255, 120, 0.35)"
             : "rgba(255, 80, 80, 0.35)";
 
-        ctx.fillRect(
-            worldPos.x - worldState.grid.cellSize / 2,
-            worldPos.y - worldState.grid.cellSize / 2,
-            worldState.grid.cellSize,
-            worldState.grid.cellSize
-        );
-
         //border
         ctx.strokeStyle = canPlace
             ? "rgba(80, 255, 120, 0.9)"
@@ -544,12 +537,26 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
         ctx.lineWidth = 2;
 
-        ctx.strokeRect(
-            worldPos.x - worldState.grid.cellSize / 2,
-            worldPos.y - worldState.grid.cellSize / 2,
-            worldState.grid.cellSize,
-            worldState.grid.cellSize
-        );
+        for (const offset of preview.data.occupiedTiles) {
+            const tileWorldPos = worldState.grid.gridToWorld({
+                x: hoverTileX + offset.x,
+                y: hoverTileY + offset.y
+            });
+
+            ctx.fillRect(
+                tileWorldPos.x - worldState.grid.cellSize / 2,
+                tileWorldPos.y - worldState.grid.cellSize / 2,
+                worldState.grid.cellSize,
+                worldState.grid.cellSize
+            );
+
+            ctx.strokeRect(
+                tileWorldPos.x - worldState.grid.cellSize / 2,
+                tileWorldPos.y - worldState.grid.cellSize / 2,
+                worldState.grid.cellSize,
+                worldState.grid.cellSize
+            );
+        }
 
         ctx.restore();
     }

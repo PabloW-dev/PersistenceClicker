@@ -7,7 +7,7 @@ const SPEED = 10;
 
 
 //TO DO: fix the pathfinding for can repath if there is a cell occupiedBy another entity
-
+//TO DO: los typeTiles tienen que afectar al movimiento, especialmente el agua que tiene que resbalar
 export default function movementSystem(deltaTime) {
     const grid = worldState.grid;
 

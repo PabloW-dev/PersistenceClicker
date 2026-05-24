@@ -2,6 +2,7 @@ import decaySystem from "./Decaysystem.js";
 import { productionSystem } from "./ProductionSystem.js";
 import { populationSystem } from "./PopulationSystem.js";
 import gameState from "../../state/GameStateG.js";
+import { useBuildingSystem } from "./UseBuildingSystem.js";
 
 const systems = [];
 
@@ -12,6 +13,7 @@ export function initSystemsB() {
     systems.push(decaySystem);
     systems.push(productionSystem);
     systems.push(populationSystem);
+    systems.push(useBuildingSystem);
 }
 
 export function runSystemsB(deltaTime, camera) {
