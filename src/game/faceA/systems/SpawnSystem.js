@@ -6,6 +6,8 @@ import gameStateA from "../state/GameStateA";
 import { createShadowEnemy } from "../entities/Shadow";
 import { ARCHETYPES } from "./ArchetypeDefinition";
 import { randomFrom } from "../../../utils/math";
+import { getObjectInRadius } from "../../LogicG";
+import gameState from "../../state/GameStateG";
 
 const shadowSprites = ["shadowOne", "shadowTwo", "shadowThree", "shadowFour"];
 const MAX_ENEMIES = 500;
@@ -52,10 +54,33 @@ function spawnEnemyFromPortal(portal) {
         const archetype = getArchetypeById(archetypeId);
 
         if (archetype?.echoFactory) {
-            worldState.entities.push(
-                archetype.echoFactory(x, y)
-            );
-            return;
+            if(!gameState.firstRun) {
+                const { x: tileX, y: tileY } =
+                    worldState.grid.worldToGrid({
+                        x,
+                        y
+                    });
+
+                const nearByObjects = getObjectInRadius(
+                    tileX,
+                    tileY,
+                    0
+                );
+
+                const isBlocked = nearByObjects.length > 0;
+
+                if(!isBlocked) {
+                    worldState.entities.push(
+                        archetype.echoFactory(x, y)
+                    );
+                    return;
+                }
+            } else {
+                worldState.entities.push(
+                        archetype.echoFactory(x, y)
+                    );
+                    return;
+            }
         }
     }
 

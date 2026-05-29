@@ -1,4 +1,5 @@
 // Grid of the world
+import gameState from "../state/GameStateG";
 import worldState from "./WorldState";
 
 const cellSize = 32;
@@ -71,7 +72,15 @@ class Grid {
 
         const tile = worldState.tileMap?.getTile(x, y);
 
-        if (tile?.structureId) return true;
+        if (tile?.structureId) {
+
+            //A:
+            if(gameState.currentFace === "A" && this.isRuinTile(x, y)) {
+                return false;
+            }
+
+            return true;
+        }
 
         const blockingStructure = worldState.structures.find(
             s => s.type === "tower" || s.type === "centerTown"
@@ -94,6 +103,20 @@ class Grid {
         }
 
         return false;
+    }
+
+    isRuinTile(x, y) {
+        if(gameState.firstRun) return;
+
+        const tile = worldState.tileMap?.getTile(x, y);
+
+        if (!tile?.structureId) return false;
+
+        const ruin = worldState.scenographics.find(
+            s => s.id === tile.structureId && s.data?.yearsToErase
+        );
+
+        return !!ruin;
     }
 }
 

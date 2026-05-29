@@ -66,7 +66,6 @@ export function ProcessButton({ archetype, state }) {
     let label;
 
     if(process) {
-        console.log(process.type);
         if (process.type === "resurrect") label = "Reviving";
         else if (process.type === "investigate") label = "Investigating";
         else label = "Add Time";

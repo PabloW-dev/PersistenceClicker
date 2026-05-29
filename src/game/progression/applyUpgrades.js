@@ -14,4 +14,5 @@ export function applyUpgrade(archetype, upgrade) {
 
     // volver a idle
     entity.data.state = "idle";
+    entity.data.isBusy = false;
 }

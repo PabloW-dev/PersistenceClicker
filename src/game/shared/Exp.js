@@ -7,6 +7,8 @@ function plusExp(value) {
     if (!gameState.gameStart || gameState.currentFace !== "A") return;
 
     gameState.currentExp += value;
+    gameState.statistics.totalExp += value;
+    gameState.statistics.totalExpOfRun += value;
 }
 
 export {

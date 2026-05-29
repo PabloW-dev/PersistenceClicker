@@ -79,7 +79,7 @@ export function getNearestWalkableCell(target, grid) {
                 const y = center.y + dy;
 
                 if (!grid.isValidCell(x, y)) continue;
-                if (!grid.isBlocked(x, y)) continue;
+                if (grid.isBlocked(x, y)) continue;
                 
                 candidates.push({ x, y });
             }

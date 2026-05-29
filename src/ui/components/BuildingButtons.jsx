@@ -11,7 +11,7 @@ export default function BuildingButtons() {
       {availableBuildings.map(b => (
         <button 
             key={b.id}
-            className="build-button" 
+            className="process-button" 
             onClick={() => startBuildingMode(b.id)}
         >
             {b.name}

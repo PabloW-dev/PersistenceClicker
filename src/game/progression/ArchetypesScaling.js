@@ -11,10 +11,10 @@ export const archetypeScaling = {
     },
 
     logistician: {
-        hp: lvl => 40 + (lvl - 1) * 12,
+        hp: lvl => 30 + (lvl - 1) * 3,
         damage: lvl => 20 + (lvl - 1) * 5,
-        visionRange: lvl => 120 + (lvl - 1) * 8,
-        attackRange: lvl => 20 + (lvl - 1) * 2,
+        visionRange: lvl => 180 + (lvl - 1) * 2,
+        attackRange: lvl => 180 + (lvl - 1) * 2,
     },
 
     defender: {

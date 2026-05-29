@@ -2,6 +2,7 @@ import worldState from "../../game/world/WorldState";
 import { canMove } from "../../utils/entitiesState";
 import { findPath, getNearestWalkableCell } from "../../game/world/PathFinding";
 import { GroundMoveCost } from "../../game/world/Tile";
+import gameState from "../../game/state/GameStateG";
 
 const SPEED = 10;
 
@@ -46,25 +47,41 @@ export default function movementSystem(deltaTime) {
 }
 
 function handleEchoMovement(entity, grid, deltaTime, tower) {
+    console.log("mi estado", entity.data.state);
+
     const combatTarget = entity.data.combatTarget;
     const target = combatTarget || tower;
-
 
     entity.data.repathTimer = Math.max(0, entity.data.repathTimer - deltaTime);
 
     // sin objetivo
     if (!target) {
         entity.data.state = "idle";
-        entity.data.combatTarget = null;
         entity.data.path = [];
         entity.data.pathIndex = 0;
         entity.data.cachedTargetCell = null;
         entity.data.lastTargetRef = null;
+        entity.data.lastTargetPos = null;
         return;
     }
 
-    const targetId = target.id ?? target.type;
-    const targetChanged = entity.data.cachedTargetId !== targetId;
+    const targetChanged = entity.data.lastTargetRef !== target;
+
+    const targetMoved =
+        combatTarget &&
+        (
+            entity.data.lastTargetPos?.x !== combatTarget.x ||
+            entity.data.lastTargetPos?.y !== combatTarget.y
+        );
+
+    if (targetChanged) {
+        entity.data.path = [];
+        entity.data.pathIndex = 0;
+        entity.data.cachedTargetCell = null;
+        console.log("he cambiado", targetChanged);
+    }
+
+    entity.data.lastTargetRef = target;
 
     const currentCell = grid.worldToGrid({
         x: entity.x,
@@ -74,14 +91,23 @@ function handleEchoMovement(entity, grid, deltaTime, tower) {
     //caché de cells
     let safeTargetCell = entity.data.cachedTargetCell;
 
-    if (!safeTargetCell || targetChanged) {
+    if (!safeTargetCell || targetChanged || targetMoved) {
         safeTargetCell = getNearestWalkableCell(target, grid);
 
         entity.data.cachedTargetCell = safeTargetCell;
         entity.data.lastTargetRef = target;
-        entity.data.cachedTargetId = targetId;
+
+        if (combatTarget) {
+            entity.data.lastTargetPos = {
+                x: combatTarget.x,
+                y: combatTarget.y
+            };
+        }
     }
 
+    if (!safeTargetCell) {
+        return;
+    }
 
     //llegó al objetivo
     if (
@@ -108,6 +134,7 @@ function handleEchoMovement(entity, grid, deltaTime, tower) {
     // SI NO HAY PATH → recalcular SIEMPRE
     const shouldRepath = 
         targetChanged ||
+        targetMoved ||
         (entity.data.repathTimer <= 0 && (!hasPath || cellTargetChanged));
 
     if(shouldRepath) {
@@ -121,25 +148,39 @@ function handleEchoMovement(entity, grid, deltaTime, tower) {
             entity.data.lastTargetX = safeTargetCell.x;
             entity.data.lastTargetY = safeTargetCell.y;
         } else {
-            // no bloquear IA si no hay path
-            entity.data.repathTimer = 0.5;
-
-            // cambia target cell para evitar stuck
             entity.data.cachedTargetCell = null;
             entity.data.lastTargetX = null;
             entity.data.lastTargetY = null;
-            
+
+
+            const dx = safeTargetCell.x - currentCell.x;
+            const dy = safeTargetCell.y - currentCell.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist > 0) {
+                const dirX = dx / dist;
+                const dirY = dy / dist;
+
+                const speed = (entity.data.speed || 20) * 5;
+
+                entity.x += dirX * speed * deltaTime;
+                entity.y += dirY * speed * deltaTime;
+            }
+
             return;
         }
     }
 
     // estado
+    console.log("COMBAT_TAGERT", entity.data.combatTarget);
     entity.data.state = combatTarget
         ? "moving_to_combat"
         : "moving_to_tower";
 
     // mover
     followPath(entity, grid, deltaTime);
+
+    entity.data.lastTargetRef = target;
 }
 
 function followPath(entity, grid, deltaTime) {
@@ -198,9 +239,40 @@ function followPath(entity, grid, deltaTime) {
 
     const nextCell = path[index];
 
+    if(!gameState.firstRun) {
+        const nextTile = worldState.tileMap?.getTile(nextCell.x, nextCell.y);
+
+        const ruin = nextTile?.structureId && worldState.scenographics.find(
+            s => s.id === nextTile.structureId && s.data?.yearsToErase
+        );
+
+        if(ruin) {
+            entity.data.currentRuinId ??= ruin.id;
+
+            entity.data.ruinPauseTimer ??= ruin.data.pauseTimer;
+
+            if (entity.data.currentRuinId !== ruin.id) {
+
+                entity.data.currentRuinId = ruin.id;
+
+                entity.data.ruinPauseTimer =
+                    ruin.data.pauseTimer;
+            }
+
+            entity.data.ruinPauseTimer -= deltaTime;
+
+            if (entity.data.ruinPauseTimer > 0) {
+                return;
+            }
+        } else {
+            entity.data.currentRuinId = null;
+            entity.data.ruinPauseTimer = null;
+        }
+    }
+
     const occupied = grid.getCell(nextCell.x, nextCell.y)?.occupiedBy;
 
-    if (occupied && occupied !== entity.id) {
+    if (entity.type === "villager" && occupied && occupied !== entity.id) {
 
         entity.data.blockedTimer =
             (entity.data.blockedTimer || 0) + deltaTime;

@@ -1,5 +1,5 @@
 export function canBeSelected(entity) {
-    return entity.data.state !== "leveling" && entity.data.state !== "dead" && entity.data.state !== "investigating";
+    return !entity.data.isBusy && entity.data.state !== "dead";
 }
 
 export function canReceiveOrders(entity) {
@@ -7,7 +7,10 @@ export function canReceiveOrders(entity) {
 }
 
 export function canMove(entity) {
-    return entity.data.state === "moving" || "moving_to_tower";
+    return (
+        entity.data.state === "moving" ||
+        entity.data.state === "moving_to_tower"
+    );
 }
 
 export function canAct(entity) {

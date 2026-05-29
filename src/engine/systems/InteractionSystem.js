@@ -147,10 +147,8 @@ function interactionSystem(worldPos, camera) {
 
             selected.data.actionType = "obtaining_resources";
             selected.data.actionTarget = scenographic;
-            console.log(selected.data.actionTarget);
             selected.data.state = "moving";
             scenographic.data.reservedBy = selected.id;
-            console.log(selected);
 
             const grid = worldState.grid;
 

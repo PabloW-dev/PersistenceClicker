@@ -2,15 +2,23 @@
 // global status for data shared between FaceA and FaceB
 
 const gameState = {
-    currentExp: 1000,
-    currentTime: 0.0,
-    currentFace: "B",
+    currentExp: 0,
+    currentTime: 60.0,
+    currentFace: "A",
     gameStart: true,
     activeProcesses: [],
     timeShakeTrigger: 0,
     timeShakeTriggerEXP: 0,
-    selectedEntityId: null, //because I don't want a value since beggining, only for give values
-    firstRun: true
+    selectedEntityId: null,
+    firstRun: true,
+    transitioning: false,
+
+    statistics: {
+        totalExp: 0,
+        totalExpOfRun: 0,
+        totalTime: 0,
+        timeOfRun: 0,
+    }
 };
 
 

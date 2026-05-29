@@ -14,9 +14,9 @@ import movementSystem from "../systems/MovementSystem.js";
 import { initSystemsA, runSystemsA } from "../../game/faceA/systems/SystemAManager.js";
 import { initSystemsB, runSystemsB } from "../../game/faceB/systems/SystemBManager.js";
 import ExpSystem from "../systems/ExpSystem.js";
-import changeFace from "../scenes/SceneManager.js";
 import { updateBuildMode } from "../../game/faceB/systems/ConstructionSystem.js";
 import { influenceSystem } from "../systems/InfluenceSystem.js";
+import TransitionSystem from "../scenes/TransitionManager.js";
 
 
 let renderer = null;
@@ -82,13 +82,11 @@ function loop(deltaTime) {
             renderer.canvas.height
         );
 
-        if (gameState.currentFace === "B" && !worldState.tileMap) {
-            changeFace();
-        }
-
         updateGrid(clampedDelta);
 
         influenceSystem(clampedDelta);
+
+        TransitionSystem(clampedDelta);
 
         renderer.render(worldState, camera, gameState.selectedEntityId);
     }

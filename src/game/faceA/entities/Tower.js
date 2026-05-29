@@ -17,7 +17,7 @@ function createTower() {
                 y: 0.75
             },
             size: {
-                w: 128,
+                w: 64,
                 h: 128
             }
         },
@@ -32,6 +32,7 @@ function createTower() {
 
         data: {
             hp: 1000,
+            hpMax: 1000,
             navSize: 1,
             navOffsetY: -1,
 

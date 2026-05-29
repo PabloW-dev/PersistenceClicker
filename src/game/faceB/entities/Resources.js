@@ -125,7 +125,7 @@ export function createRuin(x, y, tileX, tileY, spriteType) {
             spriteType,
             
             years: 0,
-            yearsToErase: 700, //esto en el propio sistema significa que 1 ruina dura 1 semana antes de derrumbarse definitivamente, si está scouteada o no da igual, la única manera de que no se erased resulta reconstruirla (y entonces ya entraría en el proceso de decay de los edificios)
+            yearsToErase: 100, //esto en el propio sistema significa que 1 ruina dura 1 semana antes de derrumbarse definitivamente, si está scouteada o no da igual, la única manera de que no se erased resulta reconstruirla (y entonces ya entraría en el proceso de decay de los edificios)
 
             depleted: false, //esto no sé si va a hacer falta porque cuando el hp llegue a 0 va a resultar 0 y punto, así que if depleted resulta lo mismo que if hp 0 para manejar la lógica, además el proceso de decay de las ruins no depende del depleted
 
@@ -137,35 +137,7 @@ export function createRuin(x, y, tileX, tileY, spriteType) {
             reservedBy: null,
 
             //For A:
-            pauseTimer: 10,
+            pauseTimer: 3,
         }
     })
 }
-
-//TO DO: para que las ruinas en A sólo hagan que los enemigos se paren unos segundos ante ellas, como si las estuviesen trepando
-
-//function canCrossRuin(entity, tile) {
-//    if (gameState.currentFace !== "A") return false;
-//
-//    const structure =
-//        worldState.scenographics.find(
-//            s => s.id === tile.structureId
-//        );
-//
-//    if (!structure) return false;
-//
-//    return structure.data?.yearsToErase;
-//}
-
-//Y luego en movement:
-
-//if (blockedByRuin) {
-//
-//    entity.data.ruinPauseTimer -= deltaTime;
-//
-//    if(entity.data.ruinPauseTimer > 0) {
-//        return;
-//    }
-//
-//    entity.data.ruinPauseTimer = structure.data.pauseTimer;
-//}

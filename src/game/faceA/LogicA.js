@@ -49,6 +49,7 @@ export function startProcess(type, archetype, upgrade) {
         const nextLevel = currentLevel + 1;
 
         entity.data.state = "leveling";
+        entity.data.isBusy = true;
 
         process = createProcess({
             type,
@@ -61,6 +62,15 @@ export function startProcess(type, archetype, upgrade) {
     }
 
     if (type === "investigate") {
+        const entity = worldState.entities.find(
+            e => e.type === "archetype" && e.data.archetypeId === archetype.id
+        );
+
+        if(!entity) return;
+
+        entity.data.state = "investigating";
+        entity.data.isBusy = true;
+
         process = createProcess({
             type,
             duration: upgrade.duration,
@@ -129,7 +139,8 @@ function levelUpArchetype(archetype) {
         entity.data[key] = scaling[key](lvl);
     }
 
-    entity.data.state = "active";
+    entity.data.state = "idle";
+    entity.data.isBusy = false;
 }
 
 export function startResurrectProcess(entity) {

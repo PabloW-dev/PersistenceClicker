@@ -22,6 +22,7 @@ export function createShadowEnemy(x, y, spriteType) {
         data: {
             clicks: 4,
             hp: 20,
+            MaxHp: 20,
             speed: 40,
             drainRadius: 150,
             drainPerSecond: 0.5,

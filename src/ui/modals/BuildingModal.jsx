@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import worldState from '../../game/world/WorldState';
+import { emit } from '../../utils/events';
+import { changeToA } from '../../engine/scenes/SceneManager';
+import gameState from '../../game/state/GameStateG';
+import { startSceneTransition } from '../../engine/scenes/TransitionManager';
 
 
 BuildingModal.propTypes = {
@@ -25,12 +29,10 @@ export default function BuildingModal({ structureId }) {
       <p>Use: {structure.type === "structure"
                 ? structure.data.actionDescription
                 : "Special"}</p>
-      {structure.type === "structure"
-      ? (
+      {structure.type === "structure" && (
         <p>
           Inside: {entity?.data?.name || (entity ? "Villager" : "Nobody")}
-        </p>)
-      : (<></>)}
+        </p>)}
       {structure.data.state === "emplacement" && (
         <div>
           <p>Required materials:</p>
@@ -41,10 +43,9 @@ export default function BuildingModal({ structureId }) {
           }
         </div>
       )}
-      {structure.data.storage
-      ? (<div>
+      {structure.data.storage && (<div>
           <button
-            className="modal-button"
+            className="process-button"
             onClick={() => {
               structure.data.storage.mode =
                 structure.data.storage.mode === "deposit"
@@ -65,8 +66,28 @@ export default function BuildingModal({ structureId }) {
               : "Empty"
             }
           </p>
-        </div>)
-      : (<></>)}
+        </div>)}
+
+      {gameState.currentFace === "B" && structure.id === "sundial" && structure.data.state === "build" && (
+        <div>
+          <p>Are you sure you want to come back?</p>
+
+          <button className="process-button" onClick={() => {
+            if(gameState.currentFace !== "B") return; 
+            
+            startSceneTransition(changeToA())
+            }}>
+            Yes
+          </button>
+
+          <button className="process-button" onClick={
+            () => 
+              emit("closeModal")
+            }>
+            No
+          </button>
+        </div>
+      )}
     </div>
   )
 }

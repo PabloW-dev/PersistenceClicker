@@ -57,7 +57,5 @@ export function useBuildingSystem(deltaTime) {
 
             continue;
         }
-
-        //MANAGEMENT_RESOURCES
     }
 }

@@ -36,6 +36,7 @@ export function startBuildingMode(buildingId) {
 
     if (!building) return false;
 
+    //no más de los que se pueden construir
     if (worldState.structures.filter(
         s => s.data.referenceId === buildingId
     ).length >= building.maxInWorld) return false;

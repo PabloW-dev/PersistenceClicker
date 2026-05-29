@@ -22,11 +22,12 @@ export function createEchoProtagonist(x, y, spriteType) {
             AsocArchRel: "protagonist",
             level: 1,
             hp: 50,
+            MaxHp: 50,
             speed: 10,
             damage: 10,
             attackRange: 25,
             attackRangeOverrides: {
-                tower: 120
+                tower: 140
             },
             canFight: true,
             visionRange: 120,
@@ -45,6 +46,7 @@ export function createEchoProtagonist(x, y, spriteType) {
             cachedTargetCell: null,
             lastTargetRef: null,
             cachedTargetId: null,
+            lastTargetPos: null,
             repathTimer: 0,
             movementType: "ground",
 

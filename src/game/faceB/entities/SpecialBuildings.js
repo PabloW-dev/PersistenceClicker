@@ -77,6 +77,9 @@ export function createProtagonistStatue(x, y, tileX, tileY, spriteType) {
         data: {
             spriteType,
 
+            hp: 250,
+            hpMax: 250,
+
             blockMovement: true,
             blockBuilding: true,
 
@@ -112,6 +115,9 @@ export function createLogicianStatue(x, y, tileX, tileY, spriteType) {
 
         data: {
             spriteType,
+
+            hp: 250,
+            hpMax: 250,
 
             blockMovement: true,
             blockBuilding: true,
@@ -149,6 +155,9 @@ export function createLogisticianStatue(x, y, tileX, tileY, spriteType) {
         data: {
             spriteType,
 
+            hp: 250,
+            hpMax: 250,
+
             blockMovement: true,
             blockBuilding: true,
 
@@ -184,6 +193,9 @@ export function createDefenderStatue(x, y, tileX, tileY, spriteType) {
 
         data: {
             spriteType,
+
+            hp: 1,
+            hpMax: 250,
 
             blockMovement: true,
             blockBuilding: true,

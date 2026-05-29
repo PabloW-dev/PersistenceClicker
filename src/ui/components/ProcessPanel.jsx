@@ -15,7 +15,7 @@ ProcessPanel.propTypes = {
 export function ProcessPanel({ archetypes, state }) {
   return (
     <>
-      {archetypes?.filter(a => shouldShowArchetype(a, state)).map(a => (
+      {archetypes?.filter(a => shouldShowArchetype(a.id)).map(a => (
         <ProcessButton key={a.id} archetype={a} state={state} />
     ))}
     </>

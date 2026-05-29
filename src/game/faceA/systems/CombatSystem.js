@@ -5,6 +5,9 @@ import worldState from "../../world/WorldState";
 import { canAct } from "../../../utils/entitiesState";
 import { startResurrectProcess } from "../LogicA";
 import { buildingsToGoRuin, BuildingToRuin } from "../../shared/Decay";
+import { createArrow } from "../entities/Effects";
+import { startSceneTransition } from "../../../engine/scenes/TransitionManager";
+import { changeToB } from "../../../engine/scenes/SceneManager";
 
 const MAX_CHASE_DISTANCE = 200;
 
@@ -12,7 +15,12 @@ export default function combatSystem(deltaTime) {
     const entities = worldState.entities;
     const structures = worldState.structures;
 
-    for (const entity of entities) {
+    const fighters = [
+        ...worldState.entities,
+        ...worldState.structures.filter(s => s.data?.canFight)
+    ];
+
+    for (const entity of fighters) {
         if (entity.data?.hitFlash > 0) {
             entity.data.hitFlash = Math.max(0, entity.data.hitFlash - deltaTime);
         }
@@ -28,6 +36,12 @@ export default function combatSystem(deltaTime) {
         if (!canAct(entity)) {
             entity.data.combatTarget = null;
             entity.data.combatOrigin = null;
+
+            entity.data.cachedTargetCell = null;
+            entity.data.cachedTargetId = null;
+
+            entity.data.lastTargetX = null;
+            entity.data.lastTargetY = null;
             continue;
         }
 
@@ -60,7 +74,7 @@ export default function combatSystem(deltaTime) {
         //}
         if (!entity.data.combatTarget) {
             entity.data.combatTarget = findTarget(entity, entities, structures);
-
+            
             if (entity.data.combatTarget) {
                 entity.data.combatOrigin = {
                     x: entity.x,
@@ -75,8 +89,7 @@ export default function combatSystem(deltaTime) {
                 target.data.hp <= 0 ||
                 target.data.state === "dead"
             ) {
-                entity.data.combatTarget = null;
-                entity.data.combatOrigin = null;
+                clearCombatTarget(entity);
             } else {
                 const dx = target.x - entity.x;
                 const dy = target.y - entity.y;
@@ -85,14 +98,13 @@ export default function combatSystem(deltaTime) {
                 const loseRange = entity.data.visionRange * 1.5;
 
                 if (dist > loseRange) {
-                    entity.data.combatTarget = null;
-                    entity.data.combatOrigin = null;
+                    clearCombatTarget(entity);
                 }
             }
         }
 
         // si no hay target → idle
-        if(entity.type === "archetype") {
+        if(entity.type === "archetype" || entity.data.combatId === "Atower") {
             if (!entity.data.combatTarget) {
                 entity.data.state = "idle";
                 continue;
@@ -115,13 +127,12 @@ export default function combatSystem(deltaTime) {
             entity.data.state = "attacking";
 
             if (canAttack(entity, target, dist)) {
-                applyDamage(entity, target);
+                performanceAttack(entity, target);
                 entity.data.attackTimer = entity.data.attackCooldown;
 
                 if (target.data.hp <= 0) {
                     handleDeath(target);
-                    entity.data.combatTarget = null;
-                    entity.data.combatOrigin = null;
+                    clearCombatTarget(entity);
                 }
             }
 
@@ -137,20 +148,25 @@ export default function combatSystem(deltaTime) {
         const distFromOrigin = Math.hypot(dxOrigin, dyOrigin);
 
         if (distFromOrigin > MAX_CHASE_DISTANCE) {
-            entity.data.combatTarget = null;
-            entity.data.combatOrigin = null;
+            clearCombatTarget(entity);
             if(entity.type === "archetype") {
                 entity.data.state = "idle";
             }
             continue;
         }
 
-        if(entity.type === "archetype") {
+        if(entity.type === "archetype" || entity.type === "enemy") {
             // perder target si se sale de visión
             if (dist > entity.data.visionRange * 1.2) {
-                entity.data.combatTarget = null;
-                entity.data.combatOrigin = null;
-                entity.data.state = "idle";
+                clearCombatTarget(entity);
+                if (entity.type === "archetype") {
+                    entity.data.state = "idle";
+                }
+
+                if (entity.type === "enemy") {
+                    entity.data.state = "moving_to_tower";
+                }
+
                 continue;
             }
 
@@ -172,16 +188,22 @@ export default function combatSystem(deltaTime) {
         entity.data.state = "attacking";
 
         if (canAttack(entity, target, dist)) {
-            applyDamage(entity, target);
+            performanceAttack(entity, target);
             entity.data.attackTimer = entity.data.attackCooldown;
 
             if (target.data.hp <= 0) {
                 handleDeath(target);
-                entity.data.combatTarget = null;
-                entity.data.combatOrigin = null;
+                if (entity.type === "archetype") {
+                    clearCombatTarget(entity);
+                }
+
+                if (entity.type === "enemy") {
+                    entity.data.state = "moving_to_tower";
+                }
             }
         }
     }
+    updateProjectile(deltaTime);
 }
 
 function findTarget(entity, entities, structures) {
@@ -190,6 +212,7 @@ function findTarget(entity, entities, structures) {
     
     const isEnemy = entity.type === "enemy";
     const isArchetype = entity.type === "archetype";
+    const isDefenseTower = entity.data.combatId === "Atower";
 
     let best = null;
     let bestDist = Infinity;
@@ -206,6 +229,9 @@ function findTarget(entity, entities, structures) {
 
         // archetypes no atacan aliados
         if (isArchetype && (other.type === "tower" || other.type === "archetype" || other.type === "structure" || other.type === "resource" || other.type === "special")) continue;
+
+        //torres no atacan aliados
+        if(isDefenseTower && (other.type === "tower" || other.type === "archetype" || other.type === "structure" || other.type === "resource" || other.type === "special")) continue;
 
         const dx = other.x - entity.x;
         const dy = other.y - entity.y;
@@ -237,6 +263,7 @@ function handleDeath(entity) {
         if (entity.data.state === "dead") return;
 
         entity.data.state = "dead";
+        entity.data.isBusy = false;
 
         cancelProcessesByArchetype(entity.data.archetypeId);
 
@@ -246,17 +273,29 @@ function handleDeath(entity) {
     }
 
     if (entity.type === "structure") {
-        if (!buildingsToGoRuin.some(b => b.id === entity.id)) {
-            buildingsToGoRuin.push(entity);
+
+        if (entity.data?.referenceId === "villagerHouse") {
+            if (!buildingsToGoRuin.some(b => b.id === entity.id)) {
+                buildingsToGoRuin.push(entity);
+            }
+
+            BuildingToRuin();
+
+            return;
         }
 
-        BuildingToRuin();
+        worldState.structures = worldState.structures.filter(
+                s => s.id !== entity.id
+            );
 
         return;
     }
 
     if (entity.type === "tower") {
-        console.log("GAME OVER");
+        if (!gameState.transitioning) {
+            gameState.transitioning = true;
+            startSceneTransition(() => changeToB());
+        }
         return;
     }
 }
@@ -301,4 +340,79 @@ function cancelProcessesByArchetype(archetypeId) {
             p.state = "cancelled";
         }
     });
+}
+
+function performanceAttack(attacker, target) {
+    if (attacker.data?.attackType === "projectile") {
+
+        worldState.scenographics.push(
+            createArrow(attacker, target)
+        );
+        
+        return;
+    }
+
+    //melee
+    applyDamage(attacker, target);
+}
+
+function updateProjectile(deltaTime) {
+
+    const projectiles = worldState.scenographics.filter(
+        s => s.type === "projectile"
+    );
+
+    for (const projectile of projectiles) {
+        const target = projectile.data.target;
+
+        if(
+            !target ||
+            !target.data ||
+            target.data.hp <= 0 ||
+            target.data.state === "dead"
+        ) {
+            worldState.scenographics =
+                worldState.scenographics.filter(
+                    e => e.id !== projectile.id   
+                );
+            
+            continue;
+        }
+
+        const dx = target.x - projectile.x;
+        const dy = target.y - projectile.y;
+
+        const dist = Math.hypot(dx, dy);
+
+        if (dist <= projectile.data.speed * deltaTime) {
+            applyDamage(projectile, target);
+
+            if (target.data.hp <= 0) {
+                handleDeath(target);
+            }
+
+            worldState.scenographics =
+                worldState.scenographics.filter(
+                    s => s.id !== projectile.id
+                );
+
+            continue;
+        }
+
+        const dirX = dx /dist;
+        const dirY = dy / dist;
+
+        projectile.data.rotation = Math.atan2(dirY, dirX);
+
+        projectile.x +=
+            dirX * projectile.data.speed * deltaTime;
+        
+        projectile.y +=
+            dirY * projectile.data.speed * deltaTime;
+    }
+}
+
+function clearCombatTarget(entity) {
+    entity.data.combatTarget = null;
+    entity.data.combatOrigin = null;
 }

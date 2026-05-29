@@ -16,7 +16,14 @@ import shadowFour from "./sprites/Sombra4.png";
 import echoProtagonist from "./sprites/EchoProtagonist.png";
 
 import protagonist from "./sprites/Protagonist.png";
-import logician from "./sprites/Logician.png"
+import logician from "./sprites/Logician.png";
+import logistician from "./sprites/Logistician.png";
+
+import siloTower from "./sprites/SiloTower.png";
+
+
+//Effects
+import arrow from "./sprites/arrow.png";
 
 
 //B
@@ -89,6 +96,11 @@ const assetManifest = {
 
     protagonist,
     logician,
+    logistician,
+
+    siloTower,
+
+    arrow,
 
     villager,
     medusin,

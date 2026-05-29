@@ -6,6 +6,7 @@ import gameStateA from "../../game/faceA/state/GameStateA.js";
 import gameStateB from "../../game/faceB/state/GameStateB.js";
 import gameState from "../../game/state/GameStateG.js";
 import { BUILDABLES } from "../../game/faceB/systems/BuildingsDefinition.js";
+import fadeState from "../scenes/FadeState.js";
 
 class CanvasRenderer { //la clase que se va a meter en GameManager para asociarla al canvas de react sin mezclar trabajo de React con trabajo de la lógica
 
@@ -138,6 +139,11 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
                 ctx.save();
 
                 ctx.translate(scenographique.x, scenographique.y);
+
+                if (scenographique.data?.rotation != null) {
+                    ctx.rotate(scenographique.data.rotation);
+                }
+
                 ctx.scale(scale, scale);
 
                 ctx.drawImage(
@@ -418,6 +424,23 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         this.renderSelection(ctx, worldState, camera, selectedEntityId);
 
         ctx.restore();
+
+        //FADE
+        if(fadeState.opacity > 0) {
+            ctx.save();
+
+            ctx.globalAlpha = fadeState.opacity;
+            ctx.fillStyle = "black";
+
+            ctx.fillRect(
+                0,
+                0,
+                this.canvas.width,
+                this.canvas.height
+            );
+
+            ctx.restore();
+        }
     }
 
     renderSelection(ctx, worldState, camera, selectedEntityId) {
