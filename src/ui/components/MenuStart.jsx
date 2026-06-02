@@ -9,6 +9,8 @@ import { tutorial } from '../../game/tutorials/TutorialState';
 import SaveManager from '../../engine/persistence/SaveManager';
 import { emit } from '../../utils/events';
 import Logo from "../../assets/sprites/Logo.png";
+import MenuBackGround from "../../assets/sprites/FondoMenu.png";
+import { applySocialRewards } from '../../game/shared/MetaResources';
 
 function startNewGame() {
 
@@ -23,6 +25,8 @@ function startNewGame() {
         createTower()
     );
 
+    applySocialRewards();
+
     window.dispatchEvent(
         new Event("gameStateChange")
     );
@@ -30,7 +34,7 @@ function startNewGame() {
 
 export default function MenuStart() {
   return (
-    <div>
+    <div className="menu-container" style={{backgroundImage: `url(${MenuBackGround})`}}>
       <img 
         src={Logo}
         alt="Persistence Clicker.
@@ -87,13 +91,18 @@ export default function MenuStart() {
 
         <button
           className="process-button"
-          //onClick={}
+          onClick={() => {
+            emit("openModal", {
+              type: "RRSS"
+            })}}
         >
           Support the Project
         </button>
       </div>
 
-      <p className="menu-dev">Developed By: PabloW-dev</p>
+      <p className="menu-dev">
+        © 2026 PabloW-dev. All rights reserved.
+      </p>
     </div>
   ) //poner enlaces a redes sociales
 }

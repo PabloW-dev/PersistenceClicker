@@ -6,9 +6,11 @@ import backSceneState from "../scenes/BackSceneState";
 import { upgradeState, upgradeLogicianState } from "../../game/progression/UpgradeState";
 import fadeState from "../scenes/FadeState";
 import { tutorial } from "../../game/tutorials/TutorialState";
+import { metaResources } from "../../game/shared/MetaResources";
 
 
 const SAVE_KEY = "persistence_clicker-save";
+const META_KEY = "persistence_clicker-meta";
 
 
 function createSaveData() {
@@ -81,9 +83,33 @@ function deleteSave() {
     localStorage.removeItem(SAVE_KEY);
 }
 
+function saveMeta() {
+    localStorage.setItem(
+        META_KEY,
+        JSON.stringify(metaResources)
+    );
+}
+
+function loadMeta() {
+    const raw = localStorage.getItem(META_KEY);
+
+    if(!raw) return;
+
+    try {
+        const data = JSON.parse(raw);
+
+        Object.assign(metaResources, data);
+
+    } catch(err) {
+        console.error("Error loading meta", err);
+    }
+}
+
 export default {
     saveGame,
     loadGame,
     hasSave,
-    deleteSave
+    deleteSave,
+    saveMeta,
+    loadMeta
 };

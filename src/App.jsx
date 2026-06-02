@@ -6,10 +6,15 @@ import GameRoot from "./ui/components/GameRoot";
 import Modals from "./ui/Modals";
 import useGameState from "./hooks/useState";
 import MenuStart from "./ui/components/MenuStart";
+import SaveManager from "./engine/persistence/SaveManager";
 
 export default function App() {
     const start = useGameState();
     const [, setTick] = useState(0);
+
+    useEffect(() => {
+        SaveManager.loadMeta();
+    }, []);
 
     useEffect(() => {
         function handleClick(e) {
@@ -34,7 +39,7 @@ export default function App() {
 
         return () => window.removeEventListener("gameStateChange", rerender);
     }, []);
-
+    
     return(
         <>
             {start.gameStart && start.currentFace !== "M" ? (

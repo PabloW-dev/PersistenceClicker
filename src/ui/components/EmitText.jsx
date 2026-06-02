@@ -15,7 +15,7 @@ export default function EmitText() {
                 ...prev,
                 {
                     id,
-                    text: `+${data.value} sec`,
+                    text: `+${data.value} SEC`,
                     x: data.pos.x,
                     y: data.pos.y
                 }
@@ -51,7 +51,7 @@ export default function EmitText() {
                 ...prev,
                 {
                     id,
-                    text: `-${data.value.toFixed(1)} sec`,
+                    text: `-${data.value.toFixed(1)} SEC`,
                     x: data.pos.x,
                     y: data.pos.y
                 }
@@ -82,11 +82,30 @@ export default function EmitText() {
             }, 1500);
         });
 
+        const unsubscribeEXP = on("EXPgained", (data) => {
+            const id = crypto.randomUUID();
+
+            setFloatingTexts(prev => [
+                ...prev,
+                {
+                    id,
+                    text: `+${data.value} EXP!!`,
+                    x: data.pos.x,
+                    y: data.pos.y
+                } 
+            ]);
+
+            setTimeout(() => {
+                setFloatingTexts(prev => prev.filter(t => t.id !== id));
+            }, 5000);
+        });
+
         return () => {
             unsubscribeGain();
             unsubscribeTutorialGain();
             unsubscribeDrain();
             unsubscribeLost();
+            unsubscribeEXP();
         };
     }, []);
 

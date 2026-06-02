@@ -4,7 +4,8 @@ import { emit } from '../../utils/events';
 
 export default function ConfirmModal() {
   return (
-    <div>
+    <div className="modal-content"
+        onMouseDown={(e) => e.stopPropagation()}>
       <p>All saved data will be erased and the game will return to the main menu.
       After that, you can start a new game.
       Are you sure you want to continue?</p>

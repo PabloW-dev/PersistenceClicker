@@ -8,6 +8,7 @@ import LogicianModal from "./modals/LogicianModal";
 import VillagerModal from './modals/VillagerModal';
 import BuildingModal from './modals/BuildingModal';
 import ConfirmModal from './modals/ConfirmModal';
+import RRSSModal from './modals/RRSSModal';
 
 export default function Modals() {
     const [modal, setModal] = useState({
@@ -61,6 +62,10 @@ export default function Modals() {
 
       {modal.type === "confirm" && (
         <ConfirmModal />
+      )}
+
+      {modal.type === "RRSS" && (
+        <RRSSModal />
       )}
     </div>
   );
