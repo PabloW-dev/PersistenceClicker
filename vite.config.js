@@ -5,7 +5,7 @@ export default defineConfig({
     plugins: [react()],
     base: '/PersistenceClicker/',
     build: {
-        outDir: "/Users/unjar/Desktop/Proyectos/PersistenceClicker/Client/dist",
+        outDir: "dist",
         emptyOutDir: true  //para que borre la build anterior
     }
 });
