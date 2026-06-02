@@ -5,7 +5,7 @@ export default defineConfig({
     plugins: [react()],
     base: '/PersistenceClicker/',
     build: {
-        outDir: "../dist",
+        outDir: "dist",
         emptyOutDir: true  //para que borre la build anterior
     }
 });
