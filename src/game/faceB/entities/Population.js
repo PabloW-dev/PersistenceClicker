@@ -103,6 +103,7 @@ export function createVillager(x, y, spriteType) {
 
             spawning: true,
             spawnProgress: 0,
+            spawnHighlightStart: 0,
 
             hiddenTimer: 0,
             hiddenInStructure: false,

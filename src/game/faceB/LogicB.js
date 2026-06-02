@@ -282,9 +282,9 @@ function spawnVillager(worldState) {
         "villager"
     );
 
+    entity.data.spawnHighlightStart = performance.now();
+    
     worldState.entities.push(entity);
-
-    console.log(worldState.entities);
 }
 
 export function getVillagerCost(worldState) {

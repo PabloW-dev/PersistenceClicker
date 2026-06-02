@@ -4,14 +4,15 @@
 const gameState = {
     currentExp: 0,
     currentTime: 60.0,
-    currentFace: "A",
-    gameStart: true,
+    currentFace: "M",
+    gameStart: false,
     activeProcesses: [],
     timeShakeTrigger: 0,
     timeShakeTriggerEXP: 0,
     selectedEntityId: null,
     firstRun: true,
     transitioning: false,
+    gamePause: false,
 
     statistics: {
         totalExp: 0,

@@ -2,6 +2,7 @@
 
 import backSceneState from "../../../engine/scenes/BackSceneState";
 import gameState from "../../state/GameStateG";
+import { tutorial } from "../../tutorials/TutorialState";
 import { createTheProtagonist, createTheLogician, createTheLogistician } from "../entities/Archetypes";
 import { createEchoProtagonist } from "../entities/Enemies";
 
@@ -18,11 +19,13 @@ export const ARCHETYPES = [
             createEchoProtagonist(x, y, "echoProtagonist"),
 
         shouldShowArchetype: () => {
-            if(gameState.firstRun) {
+            if(gameState.firstRun && gameState.currentFace === "A") {
                 return gameState.statistics.timeOfRun > 15;
-            } else {
+            } else if(gameState.currentFace === "T") {
+                return tutorial.step >= 2;
+            } else if(!gameState.firstRun && gameState.currentFace === "A") {
                 return backSceneState.structures.some(
-                s => s.id === "logistician") && 
+                s => s.id === "protagonist") && 
                 gameState.statistics.timeOfRun > 15;
             }
         },
@@ -47,11 +50,13 @@ export const ARCHETYPES = [
         echoFactory: null, //TO DO
 
         shouldShowArchetype: () => {
-            if(gameState.firstRun) {
-                return gameState.statistics.totalExpOfRun > 10;
-            } else {
+            if(gameState.firstRun && gameState.currentFace === "A") {
+                return gameState.statistics.totalExpOfRun >= 9.9;
+            } else if(gameState.currentFace === "T") {
+                return false;
+            } else if(!gameState.firstRun && gameState.currentFace === "A") {
                 return backSceneState.structures.some(
-                s => s.id === "logistician") && 
+                s => s.id === "logician") && 
                 gameState.statistics.totalExpOfRun > 10;
             }
         },
@@ -75,9 +80,11 @@ export const ARCHETYPES = [
         //echoFactory: TO DO
 
         shouldShowArchetype: () => {
-            if(gameState.firstRun) {
+            if(gameState.firstRun && gameState.currentFace === "A") {
                 return gameState.statistics.timeOfRun > 180;
-            } else {
+            } else if(gameState.currentFace === "T") {
+                return false;
+            } else if(!gameState.firstRun && gameState.currentFace === "A") {
                 return backSceneState.structures.some(
                 s => s.id === "logistician") && 
                 gameState.statistics.timeOfRun > 180;

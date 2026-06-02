@@ -20,3 +20,66 @@
     75% { transform: translateX(-1px); }
     100% { transform: translateX(0); }
 }
+
+.tutorial-highlight {
+    position: relative;
+    z-index: 5;
+
+    animation: tutorialPulse 1s ease-in-out infinite;
+
+    box-shadow:
+        0 0 8px rgba(255, 255, 120, 0.8),
+        0 0 18px rgba(255, 255, 120, 0.5);
+
+    &::after {
+        content: "";
+
+        pointer-events: none;
+
+        display: block;
+
+        position: absolute;
+
+        width: 32px;
+        height: 32px;
+
+        left: -12px;
+        top: 25%;
+
+        transform: translateY(-25%);
+
+        background-image: url("../../assets/sprites/hint.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+
+        animation: tutorialHand 1s ease-in-out infinite;
+    }
+}
+
+@keyframes tutorialPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes tutorialHand {
+    0% {
+        transform: translateY(-25%);
+    }
+
+    50% {
+        transform: translateY(-50%);
+    }
+
+    100% {
+        transform: translateY(-25%);
+    }
+}

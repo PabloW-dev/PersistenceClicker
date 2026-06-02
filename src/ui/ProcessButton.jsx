@@ -5,6 +5,7 @@ import worldState from "../game/world/WorldState";
 import gameState from "../game/state/GameStateG";
 import { startProcess } from "../game/faceA/LogicA";
 import { restTime } from "../game/LogicG";
+import gameStateA from "../game/faceA/state/GameStateA";
 
 
 
@@ -84,7 +85,20 @@ export function ProcessButton({ archetype, state }) {
         : 0;
 
     return (
-        <button className="process-button" onClick={handleClick}>
+        <button
+            id={`summon-${archetype.id}`} 
+            className={`
+                process-button
+                ${
+                    gameStateA.hint.active &&
+                    gameStateA.hint.type === "dom" &&
+                    gameStateA.hint.targetId === `summon-${archetype.id}`
+                        ? "tutorial-highlight"
+                        : ""
+                }
+            `}
+            onClick={handleClick}
+        >
             {process && (
                 <div
                     className="progress-fill"

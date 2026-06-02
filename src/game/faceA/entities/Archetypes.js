@@ -48,6 +48,7 @@ export function createTheProtagonist(x, y, spriteType) {
             attackFlash: 0,
             spawning: true,
             spawnProgress: 0,
+            spawnHighlightStart: 0,
 
             lastResurrection: 0
         },
@@ -99,6 +100,7 @@ export function createTheLogician(x, y, spriteType) {
             attackFlash: 0,
             spawning: true,
             spawnProgress: 0,
+            spawnHighlightStart: 0,
 
             lastResurrection: 0
         },
@@ -152,6 +154,7 @@ export function createTheLogistician(x, y, spriteType) {
             attackFlash: 0,
             spawning: true,
             spawnProgress: 0,
+            spawnHighlightStart: 0,
 
             lastResurrection: 0
         },

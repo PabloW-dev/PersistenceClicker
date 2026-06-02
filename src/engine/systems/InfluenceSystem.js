@@ -25,7 +25,7 @@ export function influenceSystem(deltaTime) {
         const penalty = nearlyHouses.length * 10;
 
         structure.data.storage.capacity = Math.max(
-            10,
+            5,
             structure.data.storage.baseCapacity - penalty
         );
     }   

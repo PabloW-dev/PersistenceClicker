@@ -4,7 +4,7 @@ import gameState from "../state/GameStateG";
 
 
 function plusExp(value) {
-    if (!gameState.gameStart || gameState.currentFace !== "A") return;
+    if (!gameState.gameStart || (gameState.currentFace !== "A" && gameState.currentFace !== "T")) return;
 
     gameState.currentExp += value;
     gameState.statistics.totalExp += value;

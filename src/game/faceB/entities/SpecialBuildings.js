@@ -27,6 +27,8 @@ export function createSundial(x, y, tileX,tileY, spriteType, matsRequired) {
         data: {
             referenceId: "sundial",
 
+            description: "Here you can come back",
+
             hp: 1,
             hpMax: 250,
 
@@ -77,6 +79,8 @@ export function createProtagonistStatue(x, y, tileX, tileY, spriteType) {
         data: {
             spriteType,
 
+            description: "",
+
             hp: 250,
             hpMax: 250,
 
@@ -116,6 +120,8 @@ export function createLogicianStatue(x, y, tileX, tileY, spriteType) {
         data: {
             spriteType,
 
+            description: "",
+
             hp: 250,
             hpMax: 250,
 
@@ -154,6 +160,8 @@ export function createLogisticianStatue(x, y, tileX, tileY, spriteType) {
 
         data: {
             spriteType,
+
+            description: "",
 
             hp: 250,
             hpMax: 250,

@@ -1,13 +1,15 @@
 // componente raíz que envuelve la aplicación en React
 // root component that wraps the React application
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { emit } from "./utils/events";
 import GameRoot from "./ui/components/GameRoot";
 import Modals from "./ui/Modals";
 import useGameState from "./hooks/useState";
+import MenuStart from "./ui/components/MenuStart";
 
 export default function App() {
     const start = useGameState();
+    const [, setTick] = useState(0);
 
     useEffect(() => {
         function handleClick(e) {
@@ -25,15 +27,20 @@ export default function App() {
         }
     }, []);
 
+    useEffect(() => {
+        const rerender = () => setTick(t => t + 1);
+
+        window.addEventListener("gameStateChange", rerender);
+
+        return () => window.removeEventListener("gameStateChange", rerender);
+    }, []);
+
     return(
         <>
-            {start.gameStart ? (
+            {start.gameStart && start.currentFace !== "M" ? (
                 <GameRoot />
             ) : (
-                <>
-                    <h1>PersistenceClicker</h1>
-                    <h2>Time cannot be beaten... Only delayed...</h2>
-                </>
+                <MenuStart />
             )}
             
             <Modals />

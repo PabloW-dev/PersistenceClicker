@@ -13,25 +13,64 @@ import timeSystem from "../systems/TimeSystem.js";
 import movementSystem from "../systems/MovementSystem.js";
 import { initSystemsA, runSystemsA } from "../../game/faceA/systems/SystemAManager.js";
 import { initSystemsB, runSystemsB } from "../../game/faceB/systems/SystemBManager.js";
+import { initSystemsT, runSystemsT } from "../../game/tutorials/systemTManager.js";
 import ExpSystem from "../systems/ExpSystem.js";
 import { updateBuildMode } from "../../game/faceB/systems/ConstructionSystem.js";
 import { influenceSystem } from "../systems/InfluenceSystem.js";
 import TransitionSystem from "../scenes/TransitionManager.js";
+import fadeState from "../scenes/FadeState.js";
+import { tutorial } from "../../game/tutorials/TutorialState.js";
+import AutoSave from "../persistence/AutoSave.js";
+import SaveManager from "../persistence/SaveManager.js";
 
 
 let renderer = null;
 let camera = null;
+let currentCanvas = null;
+let beforeUnloadRegistered = false;
+let mouseUpHandler = null;
 
 function init(canvas) {
+    if (renderer && currentCanvas === canvas) return;
+
+    currentCanvas = canvas;
+
+    if (renderer && mouseUpHandler) {
+        renderer.canvas.removeEventListener("mouseup", mouseUpHandler);
+    }
+
     renderer = new CanvasRenderer(canvas);
     camera = new Camera(renderer.canvas);
 
     AssetsManager.loadAll(assetManifest);
+
     initSystemsA();
     initSystemsB();
+    initSystemsT();
 
-    renderer.canvas.addEventListener("mouseup", (e) => {
+    AutoSave.startAutoSave();
+
+    if(!beforeUnloadRegistered) {
+
+        window.addEventListener("beforeunload", () =>  {
+
+            if(!gameState.gameStart) return;
+            if(gameState.currentFace === "T") return;
+            if (fadeState.active) return;
+
+            SaveManager.saveGame();
+        })
+
+        beforeUnloadRegistered = true;
+    }
+
+    mouseUpHandler = (e) => {
         if (camera.hasDragged) {
+
+            if(gameState.currentFace === "T" && tutorial.step === 1) {
+                tutorial.cameraMoved = true;
+            }
+
             camera.endInteraction();
             return;
         }
@@ -45,10 +84,18 @@ function init(canvas) {
 
         const worldPos = camera.screenToWorld(screenPos);
 
-        interactionSystem(worldPos, camera);
+        const inputLocked = gameState.gamePause || fadeState.active;
+
+        if (!inputLocked) {
+            interactionSystem(worldPos, camera);
+        }
 
         camera.endInteraction();
-    });
+    };
+
+    
+    renderer.canvas.addEventListener("mouseup", mouseUpHandler);
+    
 
     renderer.onMouseMove = (screenPos) => {
         const worldPos = camera.screenToWorld(screenPos);
@@ -65,26 +112,29 @@ function loop(deltaTime) {
 
         const clampedDelta = Math.min(deltaTime, 0.033); // máximo ~30 FPS
 
-        timeSystem(clampedDelta);
-        ExpSystem(clampedDelta);
+        if(!gameState.gamePause) {
+            timeSystem(clampedDelta, camera);
+            ExpSystem(clampedDelta);
 
-        runSystemsA(clampedDelta, camera);
-        runSystemsB(clampedDelta, camera);
+            runSystemsA(clampedDelta, camera);
+            runSystemsB(clampedDelta, camera);
+            runSystemsT(clampedDelta, camera);
 
-        spawnAnimationSystem(clampedDelta);
+            spawnAnimationSystem(clampedDelta);
 
-        movementSystem(clampedDelta);
+            movementSystem(clampedDelta);
 
-        camera.clamp(
-            worldState.grid.worldWidth,
-            worldState.grid.worldHeight,
-            renderer.canvas.width,
-            renderer.canvas.height
-        );
+            camera.clamp(
+                worldState.grid.worldWidth,
+                worldState.grid.worldHeight,
+                renderer.canvas.width,
+                renderer.canvas.height
+            );
 
-        updateGrid(clampedDelta);
+            updateGrid(clampedDelta);
 
-        influenceSystem(clampedDelta);
+            influenceSystem(clampedDelta);
+        }
 
         TransitionSystem(clampedDelta);
 

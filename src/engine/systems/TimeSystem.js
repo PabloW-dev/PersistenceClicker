@@ -1,15 +1,18 @@
 // actualiza deltaTime, timers y offline time
-import { startTransition } from "react";
 import gameState from "../../game/state/GameStateG";
 import { changeToB } from "../scenes/SceneManager";
+import { startSceneTransition } from "../scenes/TransitionManager";
 
 
-export default function timeSystem(deltaTime) {
-    if(gameState.currentFace === "A") {
+export default function timeSystem(deltaTime, camera) {
+    if(gameState.currentFace === "A" || gameState.currentFace === "T") {
         gameState.statistics.timeOfRun += deltaTime;
-        if(!gameState.transitioning && gameState.currentTime <= 0) {
+
+        if(!gameState.transitioning && gameState.currentTime <= 0 && gameState.currentFace === "A") {
+            gameState.gamePause = true;
+
             gameState.transitioning = true;
-            startTransition(() => changeToB());
+            startSceneTransition(() => changeToB(), camera);
         }
     } else if(gameState.currentFace === "B") {
         gameState.statistics.timeOfRun = 0;

@@ -6,7 +6,6 @@ import { plusExp } from "../../game/shared/Exp";
 import { restEXPCanvas, addEXPToCenterTown } from "../../game/faceB/LogicB.js";
 import { getEntityAtPosition } from "./ColliderSystem.js";
 import { findPath, getNearestResourceCell, isAtTargetCell } from "../../game/world/PathFinding.js";
-import gameStateA from "../../game/faceA/state/GameStateA.js";
 import gameStateB from "../../game/faceB/state/GameStateB.js";
 import gameState from "../../game/state/GameStateG.js";
 import { placeBuilding, cancelBuildMode } from "../../game/faceB/systems/ConstructionSystem.js";
@@ -14,8 +13,12 @@ import { canBeSelected, canReceiveOrders } from "../../utils/entitiesState.js"
 import { emit } from "../../utils/events.js";
 import { POPULATION } from "../../game/faceB/systems/PopulationSystem.js"; 
 import { STRUCTURE_ACTIONS } from "../../game/faceB/systems/UseBuildingData.js";
+import fadeState from "../scenes/FadeState.js";
+import { tutorial } from "../../game/tutorials/TutorialState.js";
+import { hideHint } from "../../game/tutorials/tutorials.js";
 
 function interactionSystem(worldPos, camera) {
+    if (gameState.gamePause || fadeState.active) return;
 
     const selected = worldState.entities.find(
         e => e.id === gameState.selectedEntityId
@@ -235,8 +238,11 @@ function interactionSystem(worldPos, camera) {
             plusExp(0.1 * upgradeLogicianState.clickMultiplier);
             plusTime(worldPos, camera);
 
-            gameStateA.hint.dismissed = true;
-            gameStateA.hint.active = false;
+            if(gameState.currentFace === "T") {
+                tutorial.towerClicked = true;
+
+                hideHint();
+            }
         }
 
 
@@ -247,6 +253,8 @@ function interactionSystem(worldPos, camera) {
 
             restEXPCanvas(worldPos, camera);
             addEXPToCenterTown(worldState);
+
+            hideHint();
         }
 
         const workingVillager = getWorkingVillagerForStructure(structure);

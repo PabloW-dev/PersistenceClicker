@@ -9,10 +9,15 @@ const gameStateA = {
     hint: 
     {
         active: false,
+        
+        type: null,
+
+        targetId: null,
+        
         x: 0,
         y: 0,
-        timer: 0,
-        dismissed: false
+        
+        startTime: 0,
     },
     
     hasSummonedArchetypes: 

@@ -11,9 +11,21 @@ import { archetypeScaling } from "../progression/ArchetypesScaling";
 import { ARCHETYPES } from "./systems/ArchetypeDefinition";
 import { applyUpgrade } from "../progression/applyUpgrades";
 import { upgradeLogicianState } from "../progression/UpgradeState";
+import { tutorial } from "../tutorials/TutorialState";
 
 export function plusTime(worldPos, camera) {
-    if (!gameState.gameStart || gameState.currentFace !== "A") return;
+    if (!gameState.gameStart || (gameState.currentFace !== "A" && gameState.currentFace !== "T")) return;
+
+    if(tutorial.step === 0 && gameState.currentFace === "T") {
+        gameState.currentTime += 60;
+
+        emit("tutorialTimeGained", {
+            value: 60,
+            pos: camera.worldToScreen(worldPos)
+        });
+
+        return;
+    }
 
     gameState.currentTime += 0.5 * upgradeLogicianState.clickMultiplier;
 
@@ -111,6 +123,8 @@ function spawnArchetype(archetype) {
         pos.y,
         archetype.spriteType
     );
+
+    entity.data.spawnHighlightStart = performance.now();
 
     worldState.entities.push(entity);
 

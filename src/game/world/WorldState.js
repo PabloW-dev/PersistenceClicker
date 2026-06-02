@@ -20,7 +20,8 @@ const worldState = {
 
     structures: gameState.currentFace === "A"
         ? [createTower()]
-        : [createCenterTown()],
+        : gameState.currentFace === "B" ? [createCenterTown()] :
+        [],
 
     entities: [],
 

@@ -11,7 +11,7 @@ import { changeToB } from "../../../engine/scenes/SceneManager";
 
 const MAX_CHASE_DISTANCE = 200;
 
-export default function combatSystem(deltaTime) {
+export default function combatSystem(deltaTime, camera) {
     const entities = worldState.entities;
     const structures = worldState.structures;
 
@@ -192,7 +192,7 @@ export default function combatSystem(deltaTime) {
             entity.data.attackTimer = entity.data.attackCooldown;
 
             if (target.data.hp <= 0) {
-                handleDeath(target);
+                handleDeath(target, camera);
                 if (entity.type === "archetype") {
                     clearCombatTarget(entity);
                 }
@@ -248,7 +248,7 @@ function findTarget(entity, entities, structures) {
     return best;
 }
 
-function handleDeath(entity) {
+function handleDeath(entity, camera) {
 
     if (
         entity.type === "enemy" ||
@@ -292,9 +292,11 @@ function handleDeath(entity) {
     }
 
     if (entity.type === "tower") {
+        gameState.gamePause = true;
+        
         if (!gameState.transitioning) {
             gameState.transitioning = true;
-            startSceneTransition(() => changeToB());
+            startSceneTransition(() => changeToB(), camera);
         }
         return;
     }

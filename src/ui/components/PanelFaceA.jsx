@@ -11,7 +11,7 @@ export default function PanelFaceA() {
   const archetypes = ARCHETYPES;
 
 
-  if (state.currentFace !== "A") return null;
+  if (state.currentFace !== "A" && state.currentFace !== "T") return null;
 
   return (
     <div>

@@ -1,7 +1,6 @@
 // encargado de dibujar elementos en el canvas y manejar requestAnimationFrame
 // for drawing elements on the canvas and handling requestAnimationFrame
 import AssetsManager from "../../assets/AssetsManager";
-import assetManifest from "../../assets/AssetsManifest.js";
 import gameStateA from "../../game/faceA/state/GameStateA.js";
 import gameStateB from "../../game/faceB/state/GameStateB.js";
 import gameState from "../../game/state/GameStateG.js";
@@ -59,47 +58,6 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
         ctx.scale(camera.zoom, camera.zoom);
         ctx.translate(-camera.x, -camera.y);
-
-        //drawing background
-        if(assetManifest.backgroundA) {
-            const backgroundImg = AssetsManager.getImage("backgroundA");
-
-            if(backgroundImg) {
-                const BGwidth = 2000;
-                const BGheight = 1600;
-
-                ctx.drawImage(
-                    backgroundImg,
-                    0,
-                    0,
-                    BGwidth,
-                    BGheight
-                );
-            };
-
-        }
-
-        if (gameState.currentFace === "B") {
-            ctx.save();
-
-            ctx.globalAlpha = 0.6;
-            ctx.fillStyle = "#50D882";
-
-            ctx.fillRect(
-                0,
-                0,
-                2000,
-                1600
-            );
-
-            ctx.restore();
-        }
-        // TODO: Fondo compartido entre Face A y Face B
-        // - Usar una única textura base del mapa (2000x1600)
-        // - Aplicar un overlay de color según la cara activa
-        //   Face A → sin overlay o tono neutro
-        //   Face B → overlay de color (ej: morado/azulado) con alpha
-        // - Esto evita duplicar assets y mantiene coherencia visual
 
         const tileMap = worldState.tileMap;
         const grid = worldState.grid;
@@ -292,6 +250,47 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
                     ctx.translate(entity.x, entity.y);
 
+                    //spawn highlight
+                    if (entity.data?.spawnHighlightStart) {
+
+                        const elapsed = (performance.now() - entity.data.spawnHighlightStart) / 1000;
+
+                        if (elapsed < 3) {
+
+                            const fade = 1 - (elapsed / 3);
+
+                            const pulse =
+                                1 + Math.sin(Date.now() * 0.015) * 0.12;
+
+                            ctx.save();
+
+                            ctx.scale(pulse, pulse);
+
+                            ctx.globalCompositeOperation = "lighter";
+
+                            ctx.shadowColor = "rgba(255,255,180,0.95)";
+                            ctx.shadowBlur = 35 * fade;
+
+                            ctx.fillStyle = `rgba(255,255,180,${0.55 * fade})`;
+
+                            ctx.beginPath();
+                            ctx.arc(
+                                0,
+                                0,
+                                Math.max(width, height) * 0.8,
+                                0,
+                                Math.PI * 2
+                            );
+
+                            ctx.fill();
+
+                            ctx.restore();
+
+                        } else {
+                            entity.data.spawnHighlightStart = null;
+                        }
+                    }
+
                     // villager warning flash
                     if (
                         entity.type === "villager" &&
@@ -404,19 +403,48 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         });
 
         if (gameStateA.hint.active) {
+
+            switch (gameStateA.hint.type) {
+
+                case "click":
+                    this.renderClickHint(ctx);
+                    break;
+                
+                case "drag":
+                    this.renderDragHint(ctx);
+                    break;
+            }
+        }
+
+
+        //AMBIENTATION:
+        if(gameState.currentFace === "A" || gameState.currentFace === "T") {
             ctx.save();
 
-            // pulso suave
-            const pulse = 1 + Math.sin(Date.now() * 0.01) * 0.1;
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = "#3d123d";
+            ctx.fillRect(
+                0,
+                0,
+                2000,
+                1600
+            );
 
-            ctx.translate(gameStateA.hint.x, gameStateA.hint.y);
-            ctx.scale(pulse, pulse);
+            ctx.restore();
+        }
 
-            // glow simple
-            ctx.fillStyle = "rgba(255, 220, 0, 0.9)";
-            ctx.beginPath();
-            ctx.arc(0, -40, 8, 0, Math.PI * 2);
-            ctx.fill();
+        if (gameState.currentFace === "B") {
+            ctx.save();
+
+            ctx.globalAlpha = 0.28;
+            ctx.fillStyle = "#50D882";
+
+            ctx.fillRect(
+                0,
+                0,
+                2000,
+                1600
+            );
 
             ctx.restore();
         }
@@ -686,6 +714,158 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         b = Math.min(255, b);
 
         return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    renderClickHint(ctx) {
+        const hint = gameStateA.hint;
+
+        const img = AssetsManager.getImage("hint");
+
+        if (!img || !img.complete) return;
+
+        ctx.save();
+
+        const bob = Math.sin(Date.now() * 0.006) * 8;
+        const pulse = 1 + Math.sin(Date.now() * 0.01) * 0.05;
+
+        ctx.translate(hint.x, hint.y + bob);
+        ctx.scale(pulse, pulse);
+
+        const width = 32;
+        const height = 32;
+
+        ctx.drawImage(
+            img,
+            -width / 2,
+            -height / 2,
+            width,
+            height
+        );
+
+        ctx.restore();
+    }
+
+    renderDragHint(ctx) {
+        const hint = gameStateA.hint;
+
+        const img = AssetsManager.getImage("hint");
+
+        if (!img || !img.complete) return;
+
+        const t = (Date.now() - hint.startTime) * 0.001;
+
+        //loop
+        const cycle = (t % 2) / 2;
+
+        let offsetX = 0;
+        let offsetY = 0;
+        let alpha = 1;
+        let scale = 1;
+
+        //1:
+        if(cycle < 0.2) {
+            const p = cycle / 0.2;
+
+            offsetY = p * 18;
+
+            alpha = p;
+            scale = 1 + p * 0.08;
+
+            //PRESS
+            ctx.save();
+
+            ctx.globalAlpha = 0.6;
+
+            ctx.strokeStyle = "yellow";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.arc(
+                hint.x + 24,
+                hint.y + 40,
+                1 + p * 12,
+                -10,
+                Math.PI + 2
+            );
+
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        //2:
+        else if(cycle < 0.7) {
+            const p = (cycle - 0.2) / 0.5;
+
+            offsetX = p * 140;
+            offsetY = 18;
+
+            scale = 1.08;
+
+            //TRAIL
+            ctx.save();
+
+            ctx.globalAlpha = 0.6;
+
+            ctx.strokeStyle = "yellow";
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                hint.x + 24,
+                hint.y + 45
+            );
+
+            ctx.lineTo(
+                hint.x + offsetX + 24,
+                hint.y + 45
+            );
+
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        //3:
+        else if(cycle < 0.85) {
+            const p = (cycle - 0.7) / 0.15;
+
+            offsetX = 140;
+            offsetY = 18 - p * 18;
+
+            scale = 1.08 - p * 0.08;
+        }
+
+        //4:
+        else {
+            const p = (cycle - 0.85) / 0.15;
+
+            offsetX = 140;
+            alpha = 1 - p;
+        }
+
+        ctx.save();
+
+        ctx.translate(
+            hint.x + offsetX,
+            hint.y + offsetY
+        );
+
+        ctx.globalAlpha = alpha;
+
+        ctx.scale(scale, scale);
+
+        ctx.drawImage(
+            img,
+            -8,
+            -8,
+            32,
+            32
+        );
+
+        ctx.restore();
     }
 }
 

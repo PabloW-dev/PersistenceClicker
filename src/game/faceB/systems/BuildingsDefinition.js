@@ -40,7 +40,10 @@ export const BUILDINGS = [
         maxInWorld: Infinity,
 
         canShowButton: () => {
-            return POPULATION.villagers.currentPopulation > 0;
+            return worldState.structures.filter(
+                s => s.data.referenceId === "sundial" &&
+                s.data.state === "build"
+            ).length > 0;
         },
 
         canBeBuild: () => {
@@ -129,7 +132,7 @@ export const SPECIAL_BUILDINGS = [
                 definition.spriteType,
 
                 {
-                    stone: getScaledValue(
+                    wood: getScaledValue(
                         15,
                         "sundial",
                     )
@@ -139,10 +142,7 @@ export const SPECIAL_BUILDINGS = [
         maxInWorld: 1,
 
         canShowButton: () => {
-            return worldState.structures.filter(
-                s => s.data.referenceId === "villagerHouse" &&
-                s.data.state === "build"
-            ).length > 0;
+            return POPULATION.villagers.currentPopulation > 0;
         },
 
         canBeBuild: () => {

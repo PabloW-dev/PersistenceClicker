@@ -1,5 +1,7 @@
 // contador global, añade tiempo, restar tiempo
 
+import gameState from "../../state/GameStateG.js";
+import { tutorial } from "../../tutorials/TutorialState.js";
 import worldState from "../../world/WorldState";
 import createPortal from "../entities/Portal.js";
 import gameStateA from "../state/GameStateA.js";
@@ -11,13 +13,32 @@ const interval = 600; //every 10 min the portals have a level up
 
 export default function portalSystem(deltaTime) {
     spawnTimer += deltaTime;
+    if(gameState.currentFace === "A") {
+        if (spawnTimer >= spawnInterval) {
+            spawnPortal();
+            spawnTimer = 0;
 
-    if (spawnTimer >= spawnInterval) {
-        spawnPortal();
-        spawnTimer = 0;
+            // reduces the interval 1 each time
+            spawnInterval = Math.max(3, spawnInterval * 0.99); //never less than 3 seconds
+        }
+    } else if(gameState.currentFace === "T") {
+        if (tutorial.step >= 4) {
 
-        // reduces the interval 1 each time
-        spawnInterval = Math.max(3, spawnInterval * 0.99); //never less than 3 seconds
+            if (tutorial.firstPortal && tutorial.archetypeMoved) {
+                spawnTimer = spawnInterval;
+                tutorial.firstPortal = false;
+            }
+
+            if (spawnTimer >= spawnInterval) {
+                spawnPortal();
+                spawnTimer = 0;
+
+                spawnInterval = Math.max(
+                    3,
+                    spawnInterval * 0.99
+                );
+            }
+        }
     }
 }
 

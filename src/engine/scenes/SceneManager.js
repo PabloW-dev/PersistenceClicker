@@ -9,6 +9,10 @@ import { emit } from "../../utils/events";
 import createTower from "../../game/faceA/entities/Tower";
 import { createDefenseTower } from "../../game/faceA/entities/ManifestABuildings";
 import createCenterTown from "../../game/faceB/entities/CenterTown";
+import { upgradeLogicianState } from "../../game/progression/UpgradeState";
+import { tutorial } from "../../game/tutorials/TutorialState";
+import gameStateA from "../../game/faceA/state/GameStateA";
+import { hideHint } from "../../game/tutorials/tutorials";
 
 export default function generateFaceB() {
     if (!gameState.firstRun) return;
@@ -131,11 +135,20 @@ export function changeToA() {
     gameState.currentFace = "A";
     gameState.currentTime = 60;
     if(gameState.firstRun) gameState.firstRun = false;
+    tutorial.returnToAUsed = true;
+    tutorial.BtutorialComplete = true;
+    if(gameStateA.hint.active) {
+        hideHint();
+    }
+    gameState.gamePause = false;
+    gameState.transitioning = false;
 }
 
 export function changeToB() {
     //guardar lo que hace falta para regenerar B: por ahora sólo las defenseTowers
     const Atowers = worldState.structures.filter(s => s.data.referenceId === "defenseTower");
+    const villagerHouses = worldState.structures.filter(s => s.data.referenceId === "villagerHouse");
+    const sundial = worldState.structures.find(s => s.id === "sundial");
 
     const tower = worldState.structures.find(s => s.id === "tower");
 
@@ -152,6 +165,12 @@ export function changeToB() {
         s => s.type !== "projectile"
     );
 
+    upgradeLogicianState.clickMultiplier = 1;
+    upgradeLogicianState.passiveExp = 0;
+    upgradeLogicianState.activeUpgrades = [];
+
+
+    //preparar
     if(gameState.firstRun) {
         //crear cosas
         if (!worldState.tileMap) {
@@ -171,27 +190,41 @@ export function changeToB() {
         if(statues) {
             for(const statue of statues) {
                 worldState.structures.push(statue);
-            } //esto las pone donde estaban?!
+            }
         }
 
-        for (const atower of Atowers) {
-            const silo = backSceneState.structures.find(s => s.id === atower.data.sourceId);
+        if(sundial) {
+            worldState.structures.push(sundial);
+        }
 
-            worldState.structures.push(silo);
+        if(Atowers.length > 0) {
+            for (const atower of Atowers) {
+                const silo = backSceneState.structures.find(s => s.id === atower.data.sourceId);
+
+                worldState.structures.push(silo);
+            }
+        }
+
+        if(villagerHouses.length > 0) {
+            for (const villagerHouse of villagerHouses) {
+                worldState.structures.push(villagerHouse);
+            }
         }
 
         const villagers = backSceneState.entities.filter(e => e.type === "villager");
 
-        for(const villager of villagers) {
-            worldState.entities.push(villager);
-        }
+        if(villagers.length > 0) {
+            for(const villager of villagers) {
+                worldState.entities.push(villager);
+            }
 
-        //reservedBys
-        for (const villager of worldState.entities) {
-            const target = villager.data.actionTarget;
+            //reservedBys
+            for (const villager of worldState.entities) {
+                const target = villager.data.actionTarget;
 
-            if (target) {
-                target.data.reservedBy = villager.id;
+                if (target) {
+                    target.data.reservedBy = villager.id;
+                }
             }
         }
     }
@@ -200,7 +233,7 @@ export function changeToB() {
 
     //bonus de EXP para poder llegar a pasar a A de nuevo
     if(gameState.firstRun) {
-        gameState.currentExp += 100;
+        gameState.currentExp += 200;
     }
 
     gameState.currentFace = "B";
@@ -208,4 +241,46 @@ export function changeToB() {
     gameState.statistics.totalExpOfRun = 0;
     gameState.selectedEntityId = null;
     gameState.transitioning = false;
+    gameState.gamePause = false;
+}
+
+export function changeToM() {
+    //limpiar
+    worldState.entities = [];
+    worldState.structures = [];
+
+    //resetear
+    gameStateA.hint.active = false;
+    gameStateA.hint.type = null;
+    gameStateA.hint.targetId = null;
+    gameStateA.hint.x = 0;
+    gameStateA.hint.y = 0;
+    gameStateA.hint.startTime = 0;
+
+    tutorial.step = 0;
+    tutorial.towerClicked = false;
+    tutorial.cameraMoved = false,
+
+    tutorial.archetypeButtonClicked = false,
+    tutorial.archetypeSummoned = false,
+
+    tutorial.archetypeMoved = false,
+
+    tutorial.firstPortal = true,
+
+    tutorial.shadowClicked = false,
+
+    tutorial.AtutorialComplete = true;
+
+    //cambiar
+    gameState.currentExp = 0;
+    gameState.currentTime = 60;
+    gameState.currentFace = "M";
+    gameState.gameStart = false,
+    gameState.activeProcesses = [];
+    gameState.selectedEntityId = null;
+    gameState.statistics.totalExpOfRun = 0;
+    gameState.statistics.timeOfRun = 0;
+    gameState.transitioning = false;
+    gameState.gamePause = false;
 }

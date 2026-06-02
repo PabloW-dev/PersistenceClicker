@@ -10,6 +10,7 @@ import React from 'react';
 import useGameState from '../../hooks/useState';
 import BuildingButtons from './BuildingButtons';
 import SpecialBuildingButtons from './SpecialBuildingButtons';
+import Requirements from './Requirements';
 
 
 export default function PanelFaceB() {
@@ -23,6 +24,7 @@ export default function PanelFaceB() {
       <BuildingButtons />
       <h3>Special Buildings</h3>
       <SpecialBuildingButtons />
+      <Requirements />
     </div>
   )
 }

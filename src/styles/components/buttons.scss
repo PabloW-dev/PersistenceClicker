@@ -8,6 +8,11 @@
     cursor: pointer;
 }
 
+.process-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .progress-fill {
     position: absolute;
     left: 0;

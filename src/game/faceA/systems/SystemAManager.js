@@ -22,7 +22,7 @@ export function initSystemsA() {
 }
 
 export function runSystemsA(deltaTime, camera) {
-    if(gameState.currentFace !== "A") return;
+    if(gameState.currentFace !== "A" && gameState.currentFace !== "T") return;
     
     systems.forEach(system => system(deltaTime, camera));
 }

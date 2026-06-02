@@ -28,7 +28,9 @@ export default function BuildingModal({ structureId }) {
       <p>HP: {structure.data.hp.toFixed(0)} / {structure.data.hpMax}</p>
       <p>Use: {structure.type === "structure"
                 ? structure.data.actionDescription
-                : "Special"}</p>
+                : structure.type === "special"
+                ? structure.data.description
+                : null}</p>
       {structure.type === "structure" && (
         <p>
           Inside: {entity?.data?.name || (entity ? "Villager" : "Nobody")}
@@ -75,7 +77,7 @@ export default function BuildingModal({ structureId }) {
           <button className="process-button" onClick={() => {
             if(gameState.currentFace !== "B") return; 
             
-            startSceneTransition(changeToA())
+            startSceneTransition(() => changeToA())
             }}>
             Yes
           </button>

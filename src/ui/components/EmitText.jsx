@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import gameState from '../../game/state/GameStateG';
 import { on } from '../../utils/events';
+import { tutorial } from '../../game/tutorials/TutorialState';
 
 export default function EmitText() {
     const [floatingTexts, setFloatingTexts] = useState([]);
@@ -15,6 +16,24 @@ export default function EmitText() {
                 {
                     id,
                     text: `+${data.value} sec`,
+                    x: data.pos.x,
+                    y: data.pos.y
+                }
+            ]);
+
+            setTimeout(() => {
+                setFloatingTexts(prev => prev.filter(t => t.id !== id));
+            }, 1500);
+        });
+
+        const unsubscribeTutorialGain = on("tutorialTimeGained", (data) => {
+            const id = crypto.randomUUID();
+
+            setFloatingTexts(prev => [
+                ...prev,
+                {
+                    id,
+                    text: `+${data.value} SEC!!`,
                     x: data.pos.x,
                     y: data.pos.y
                 }
@@ -65,17 +84,18 @@ export default function EmitText() {
 
         return () => {
             unsubscribeGain();
+            unsubscribeTutorialGain();
             unsubscribeDrain();
             unsubscribeLost();
         };
     }, []);
 
     return (
-        <div className="floating-layer">
+        <div className={`floating-layer ${gameState.currentFace === "T" && tutorial.step === 0 ? "big" : ""}`}  >
             {floatingTexts.map(t => (
                 <p
                     key={t.id}
-                    className={`floating-text ${gameState.currentFace === "A" ? "A" : "B"}`}
+                    className={`floating-text ${gameState.currentFace === "A" || gameState.currentFace === "T" ? "A" : "B"}`}
                     style={{
                         left: t.x,
                         top: t.y

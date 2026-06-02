@@ -84,12 +84,12 @@ export function createSilo(x, y, tileX, tileY, spriteType, matsRequired) {
 
             state: "ghost",
             actionClick: "store",
-            actionDescription: "Villagers can use for storage materials",
+            actionDescription: "Villagers can use it to store materials, building houses nearby reduces storage capacity",
             tileTypeForEmplacement: ["plain"],
 
             
             storage: {
-                baseCapacity: 70,
+                baseCapacity: 30,
                 capacity: 70,
                 freeSpace: 999,
 

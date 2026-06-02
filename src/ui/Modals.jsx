@@ -7,6 +7,7 @@ import ArchetypeModal from './modals/ArchetypeModal';
 import LogicianModal from "./modals/LogicianModal";
 import VillagerModal from './modals/VillagerModal';
 import BuildingModal from './modals/BuildingModal';
+import ConfirmModal from './modals/ConfirmModal';
 
 export default function Modals() {
     const [modal, setModal] = useState({
@@ -56,6 +57,10 @@ export default function Modals() {
 
       {modal.type === "structure" && (
         <BuildingModal structureId={modal.payload.structureId} />
+      )}
+
+      {modal.type === "confirm" && (
+        <ConfirmModal />
       )}
     </div>
   );

@@ -2,6 +2,7 @@
 
 //General
 import backgroundA from "./sprites/FondoA.png";
+import hint from "./sprites/hint.png";
 
 
 //A
@@ -83,6 +84,7 @@ import sundialInConstruction from "./sprites/sundialInConstruction.png";
 
 const assetManifest = {
     backgroundA: backgroundA,
+    hint: hint,
 
     tower: towerImg,
     portal: portalImg,
