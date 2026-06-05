@@ -20,7 +20,7 @@
         font-family: "Uncial Antiqua", sans-serif;
         font-weight: 500;
         letter-spacing: 1px;
-        font-size: 14px;
+        font-size: 0.875rem;
         text-transform: uppercase;
     }
 }
@@ -55,7 +55,7 @@
 
 .sidebar {
     flex-shrink: 0;
-    width: 17%;
+    width: clamp(220px, 17%, 320px);
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
