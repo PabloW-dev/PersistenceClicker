@@ -45,6 +45,7 @@ export default function LogicianModal({ entityId }) {
         .filter(u => shouldShowUpgrade(u, entity))
         .map(upgrade => (
             <button
+                className="process-button logician"
                 key={upgrade.id}
                 onClick={() => handleInvestigate(upgrade, entity)}
             >
@@ -52,7 +53,7 @@ export default function LogicianModal({ entityId }) {
             </button>
         ))}
 
-        <div className="active-upgrades">
+        <div className="logician-active-upgrades">
         {upgradeLogicianState.activeUpgrades.map(id => {
             const upgrade = LOGICIAN_UPGRADES.find(u => u.id === id);
             if (!upgrade) return null;

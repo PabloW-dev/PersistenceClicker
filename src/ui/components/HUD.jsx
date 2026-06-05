@@ -51,10 +51,13 @@ export default function HUD() {
     }, [lastTriggerExp]);
 
   return (
-    <div>
-      <p className={`exp ${expShake ? "shake flash" : ""}`}
-      >EXP: {state.currentExp.toFixed(2)}</p>
-      <p className={`time ${timeShake ? "shake flash" : ""}`}>Time: {state.currentTime.toFixed(2)}</p>
+    <div className="hud">
+      <div className="hud__content">
+        <p className={`exp ${expShake ? "shake flash" : ""}`}
+        >EXP: {state.currentExp.toFixed(2)}</p>
+
+        <p className={`time ${timeShake ? "shake flash" : ""}`}>Time: {state.currentTime.toFixed(2)}</p>
+      </div>
     </div>
   );
 }

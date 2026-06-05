@@ -116,8 +116,8 @@ export default function EmitText() {
                     key={t.id}
                     className={`floating-text ${gameState.currentFace === "A" || gameState.currentFace === "T" ? "A" : "B"}`}
                     style={{
-                        left: t.x,
-                        top: t.y
+                        left: `${t.x}px`,
+                        top: `${t.y}px`
                     }}
                 >
                     {t.text}

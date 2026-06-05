@@ -7,6 +7,8 @@ import { upgradeState, upgradeLogicianState } from "../../game/progression/Upgra
 import fadeState from "../scenes/FadeState";
 import { tutorial } from "../../game/tutorials/TutorialState";
 import { metaResources } from "../../game/shared/MetaResources";
+import TileMap from "../../game/world/TileMap";
+import { restoreProcessCallbacks } from "./helpersOfSaving";
 
 
 const SAVE_KEY = "persistence_clicker-save";
@@ -20,7 +22,14 @@ function createSaveData() {
         gameState,
         gameStateA,
         gameStateB,
-        worldState,
+
+        worldState: {
+            seed: worldState.seed,
+            structures: worldState.structures,
+            entities: worldState.entities,
+            scenographics: worldState.scenographics
+        },
+
         backSceneState,
         upgradeState,
         upgradeLogicianState,
@@ -37,13 +46,22 @@ function applySaveData(data) {
     Object.assign(gameState, data.gameState);
     Object.assign(gameStateA, data.gameStateA);
     Object.assign(gameStateB, data.gameStateB);
-    Object.assign(worldState, data.worldState);
+
+
+    worldState.seed = data.worldState.seed;
+
+    worldState.entities = data.worldState.entities;
+    worldState.structures = data.worldState.structures;
+    worldState.scenographics = data.worldState.scenographics;
+
+
     Object.assign(backSceneState, data.backSceneState);
     Object.assign(upgradeState, data.upgradeState);
     Object.assign(upgradeLogicianState, data.upgradeLogicianState);
     Object.assign(fadeState, data.fadeState);
 
-    tutorial.completed = data.tutorial.completed;
+    tutorial.completedA = data.tutorial.completedA;
+    tutorial.completedB = data.tutorial.completedB;
 }
 
 function saveGame() {
@@ -66,6 +84,17 @@ function loadGame() {
         const data = JSON.parse(raw);
 
         applySaveData(data);
+
+        restoreProcessCallbacks();
+
+        if (worldState.seed) {
+            worldState.tileMap = new TileMap(
+                worldState.grid.width,
+                worldState.grid.height,
+                worldState.seed,
+                worldState.grid.cellSize
+            );
+        }
 
         return true;
 

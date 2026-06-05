@@ -101,7 +101,7 @@ export function startProcess(type, archetype, upgrade) {
     return process;
 }
 
-function spawnArchetype(archetype) {
+export function spawnArchetype(archetype) {
     const tower = worldState.structures.find(s => s.type === "tower");
     const grid = worldState.grid;
 
@@ -133,7 +133,7 @@ function spawnArchetype(archetype) {
     }
 }
 
-function levelUpArchetype(archetype) {
+export function levelUpArchetype(archetype) {
     const entity = worldState.entities.find(
         e => e.type === "archetype" && e.data.archetypeId === archetype.id
     );

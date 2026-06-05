@@ -26,9 +26,12 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         this.canvas.addEventListener("click", (e) => {
             const rect = this.canvas.getBoundingClientRect();
 
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+
             //User mouse position inside canvas
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
 
             //update mouse position inside canvas
             this.onClick && this.onClick({ x, y });
@@ -37,8 +40,11 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         this.canvas.addEventListener("mousemove", (e) => {
             const rect = this.canvas.getBoundingClientRect();
 
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
 
             this.onMouseMove && this.onMouseMove({ x, y });
         });
@@ -59,6 +65,29 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
         ctx.scale(camera.zoom, camera.zoom);
         ctx.translate(-camera.x, -camera.y);
 
+        //drawing background
+        if(gameState.currentFace === "A" || gameState.currentFace === "T") {
+            const backgroundImg = AssetsManager.getImage("backgroundA");
+
+            const width = worldState.WORLD_WIDTH || 2048;
+            const height = worldState.WORLD_HEIGHT || 1600;
+
+            if (backgroundImg && backgroundImg.complete) {
+                ctx.save();
+
+                ctx.drawImage(
+                    backgroundImg,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                ctx.restore();
+            }
+        }
+
+
         const tileMap = worldState.tileMap;
         const grid = worldState.grid;
 
@@ -77,6 +106,7 @@ class CanvasRenderer { //la clase que se va a meter en GameManager para asociarl
 
         //shadow for emplacement
         this.renderBuildPreview(ctx, worldState);
+
 
         //drawing scenograpghics
         const scenographicsSorted = [...worldState.scenographics].sort((a, b) => a.y - b.y);

@@ -20,9 +20,9 @@ export default function PanelFaceB() {
   
   return (
     <div className="face-panel">
-      <h3>Buildings</h3>
+      <h3 className="face-panel__buildings">Buildings</h3>
       <BuildingButtons />
-      <h3>Special Buildings</h3>
+      <h3 className="face-panel__buildings">Special Buildings</h3>
       <SpecialBuildingButtons />
       <Requirements />
     </div>

@@ -1,7 +1,17 @@
+.canvas-scale-wrapper {
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden;
+    position: relative;
+}
+
 .canvas-wrapper {
     position: relative;
-    width: 800px;
-    height: 600px;
+    width: 1400px;
+    height: 800px;
+
+    transform-origin: 0 0;
 }
 
 .floating-layer {
@@ -18,29 +28,47 @@
     pointer-events: none;
     font-size: 18px;
     font-weight: bold;
+
+    font-family: "Uncial Antiqua", sans-serif;
+    text-transform: uppercase;
+
+    text-shadow:
+        0 0 8px rgba(0, 184, 212, 0.25),
+        0 0 12px rgba(0, 0, 0, 0.5);
+
     animation: floatUp 1.5s ease-out forwards;
 
     &.A {
-        color: #00B8D4;
+        color: rgba(0, 184, 212, 0.95);
     }
 
     &.B {
-        color: #FF4D8D;
+        color: rgba(255, 77, 141, 0.95);
     }
 }
 
 .big .floating-text {
     font-size: 24px;
+    text-shadow:
+        0 0 12px rgba(255, 209, 102, 0.25),
+        0 0 18px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes floatUp {
     0% {
         opacity: 1;
-        transform: translate(-50%, -250%);
+        transform: translate(-50%, -250%) scale(1);
+        filter: blur(0px);
+    }
+
+    60% {
+        opacity: 0.8;
+        filter: blur(0.5px);
     }
 
     100% {
         opacity: 0;
-        transform: translate(-50%, -750%);
+        transform: translate(-50%, -750%) scale(0.95);
+        filter: blur(1px);
     }
 }

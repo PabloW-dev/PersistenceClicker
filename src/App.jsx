@@ -7,6 +7,7 @@ import Modals from "./ui/Modals";
 import useGameState from "./hooks/useState";
 import MenuStart from "./ui/components/MenuStart";
 import SaveManager from "./engine/persistence/SaveManager";
+import bg from "./assets/sprites/FondoA.png";
 
 export default function App() {
     const start = useGameState();
@@ -41,7 +42,7 @@ export default function App() {
     }, []);
     
     return(
-        <>
+        <div className="app-background" style={{ backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: "center" }}>
             {start.gameStart && start.currentFace !== "M" ? (
                 <GameRoot />
             ) : (
@@ -49,5 +50,5 @@ export default function App() {
             )}
             
             <Modals />
-        </>
+        </div>
 )};

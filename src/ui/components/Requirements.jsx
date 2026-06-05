@@ -8,7 +8,7 @@ export default function Requirements() {
     if(!sundial) return null;
 
   return (
-    <div>
+    <div className="face-panel__buildings">
       {tutorial.sundialPlaced && !tutorial.sundialReady
       ? (<p>
         Mats For Can Build:

@@ -9,11 +9,12 @@ export default function SubHUDB() {
     const nextCost = getVillagerCost(worldState);
 
   return (
-    <div>
-        <p>Stored EXP: {gameStateB.EXPinCenterTown.toFixed(0)}</p>
-        <p>Next Villager: {nextCost.toFixed(0)}</p>
+    <div className="subhud">
+        <p className="subhud__exp">Stored EXP: {gameStateB.EXPinCenterTown.toFixed(0)}</p>
+        <div className="subhud__element" />
+        <p className="subhud__villager">Next Villager: {nextCost.toFixed(0)}</p>
 
-        <p>POPULATION: {POPULATION.villagers.currentPopulation} / {POPULATION.villagers.getCurrentMax()} </p>
+        <p className="subhud__population">POPULATION: {POPULATION.villagers.currentPopulation} / {POPULATION.villagers.getCurrentMax()} </p>
     </div>
   );
 }

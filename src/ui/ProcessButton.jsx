@@ -24,6 +24,12 @@ function hasArchetype(archetype) {
     );
 }
 
+function getArchetypeEntity(archetype) {
+    return worldState.entities.find(
+        e => e.type === "archetype" && e.data.archetypeId == archetype.id
+    );
+}
+
 
 export function ProcessButton({ archetype, state }) {
     const activeProcesses = state.activeProcesses;
@@ -47,7 +53,10 @@ export function ProcessButton({ archetype, state }) {
         resurrectProcess || 
         investigateProcess || 
         normalProcess; 
-        //priorizing resurrect type
+    
+    const entity = getArchetypeEntity(archetype);
+
+    const level = entity?.data.level;
     
 
     function handleClick() {
@@ -109,7 +118,13 @@ export function ProcessButton({ archetype, state }) {
             <span className="label">
                 {label}
                 {process && `(${remaining}s)`}
+                
             </span>
+            {level && (
+                <span className="process-level">
+                    {level}
+                </span>
+            )}
         </button>
     );
 }

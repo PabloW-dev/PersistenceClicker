@@ -14,7 +14,7 @@ export default function PanelFaceA() {
   if (state.currentFace !== "A" && state.currentFace !== "T") return null;
 
   return (
-    <div>
+    <div className="face-panel">
         <ProcessPanel archetypes={archetypes} state={state} />
     </div>
   );

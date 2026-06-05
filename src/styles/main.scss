@@ -1,12 +1,14 @@
 //documentos SCSS globales y componentes
 //global SCSS documents and components
-
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap');
 @import "./components/floatingtexts.scss";
 @import "./components/juice.scss";
 @import "./components/buttons.scss";
 @import "./components/modal.scss";
 @import "./components/panels.scss";
 @import "./components/menu.scss";
+@import "./components/hud.scss";
+@import "./components/subhuds.scss";
 
 html,
 body,
@@ -19,5 +21,6 @@ body,
 }
 
 body {
+    margin: 0;
     overflow: hidden;
 }

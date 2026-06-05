@@ -13,6 +13,12 @@
     z-index: 9999; // por encima de TODO
 }
 
+.logician-active-upgrades {
+    color: #00E5FF;
+    font-family: "Uncial Antiqua", sans-serif;
+    text-transform: uppercase;
+}
+
 .modal-content {
     background: rgba(44, 58, 63, 0.45);
     backdrop-filter: blur(6px);
@@ -24,6 +30,8 @@
     margin-right: 40px;
     max-width: 300px;
     pointer-events: auto;
+    font-family: "Uncial Antiqua", sans-serif;
+    text-transform: uppercase;
 
     .modal-title {
         display: flex;
@@ -176,6 +184,8 @@
 
     font-size: 18px;
     font-weight: bold;
+    font-family: "Uncial Antiqua", sans-serif;
+
 
     outline: none;
     box-sizing: border-box;

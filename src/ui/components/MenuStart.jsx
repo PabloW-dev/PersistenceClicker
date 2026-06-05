@@ -1,7 +1,7 @@
 // menú inicial antes de empezar la partida
 // main initial menú before starting the game
 
-import React from 'react'
+import React, { useRef } from 'react'
 import gameState from '../../game/state/GameStateG'
 import worldState from '../../game/world/WorldState';
 import createTower from '../../game/faceA/entities/Tower';
@@ -10,7 +10,10 @@ import SaveManager from '../../engine/persistence/SaveManager';
 import { emit } from '../../utils/events';
 import Logo from "../../assets/sprites/Logo.png";
 import MenuBackGround from "../../assets/sprites/FondoMenu.png";
-import { applySocialRewards } from '../../game/shared/MetaResources';
+import { applySocialRewards, metaResources } from '../../game/shared/MetaResources';
+import useTimeCrack from '../effects/TimeCrack';
+import { hideHint } from '../../game/tutorials/tutorials';
+import gameStateA from '../../game/faceA/state/GameStateA';
 
 function startNewGame() {
 
@@ -33,8 +36,13 @@ function startNewGame() {
 }
 
 export default function MenuStart() {
+  const menuRef = useRef(null);
+
+  useTimeCrack(menuRef);
+
   return (
-    <div className="menu-container" style={{backgroundImage: `url(${MenuBackGround})`}}>
+    <div ref={menuRef} className="menu-container" style={{backgroundImage: `url(${MenuBackGround})`}}>
+
       <img 
         src={Logo}
         alt="Persistence Clicker.
@@ -44,7 +52,7 @@ export default function MenuStart() {
 
       <div className="menu-buttons">
         <button 
-          className="process-button" 
+          className="process-button menu" 
           onClick={() => {
 
               if(SaveManager.hasSave()) {
@@ -63,34 +71,47 @@ export default function MenuStart() {
         </button>
 
         <button
-          className="process-button"
+          className="process-button menu"
           disabled={!SaveManager.hasSave()}
           onClick={() => {
             if(!SaveManager.hasSave()) return;
 
             SaveManager.loadGame();
 
-            window.dispatchEvent(new Event("gameStateChange"));
+            applySocialRewards();
+
+            setTimeout(() => {
+              window.dispatchEvent(new Event("gameStateChange"));
+              window.dispatchEvent(new Event("engineReinit"));
+            }, 0);
           }}>
           Continue Game
         </button>
 
         <button 
-          className="process-button" 
+          className={`process-button menu 
+            ${!metaResources.tutorialFirstCompleted 
+                ? "tutorial-highlight"
+                : ""
+            }`
+          }
           onClick={() => {
             if(!tutorial.AtutorialComplete) {
-            gameState.gameStart = true;
-            gameState.currentFace = "T";
-            gameState.firstRun = true;
-            worldState.structures.length = 0;
-            worldState.structures.push(createTower());
-            window.dispatchEvent(new Event("gameStateChange"));
+              if(gameStateA.hint.active) {
+                hideHint();
+              }
+              gameState.gameStart = true;
+              gameState.currentFace = "T";
+              gameState.firstRun = true;
+              worldState.structures.length = 0;
+              worldState.structures.push(createTower());
+              window.dispatchEvent(new Event("gameStateChange"));
           }}}>
             {!tutorial.AtutorialComplete ? "Tutorial of The Entropy" : "Completed!"} 
         </button>
 
         <button
-          className="process-button"
+          className="process-button menu"
           onClick={() => {
             emit("openModal", {
               type: "RRSS"
@@ -104,5 +125,5 @@ export default function MenuStart() {
         © 2026 PabloW-dev. All rights reserved.
       </p>
     </div>
-  ) //poner enlaces a redes sociales
+  )
 }

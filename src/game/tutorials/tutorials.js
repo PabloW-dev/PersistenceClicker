@@ -3,6 +3,7 @@
 import { changeToM } from "../../engine/scenes/SceneManager";
 import { startSceneTransition } from "../../engine/scenes/TransitionManager";
 import gameStateA from "../faceA/state/GameStateA";
+import { metaResources } from "../shared/MetaResources";
 import gameState from "../state/GameStateG";
 import worldState from "../world/WorldState";
 import { tutorial } from "./TutorialState";
@@ -77,19 +78,19 @@ export function updateTutorialA(deltaTime) {
         }
     }
 
-    if (tutorial.step === 3 && gameState.selectedEntityId) { //esto funciona por lo mismo, sólo se puede seleccionar a protagonist
+    if (tutorial.step === 3 && gameState.selectedEntityId) {
         hideHint();
 
         if(gameState.selectedEntityId && !gameStateA.hint.active) {
-            showHint({ //esto resulta lo complicado, protagonist puede aparecer en cualquier punto alrededor de la torre, así que va a resultar un tema indicar al jugador un punto vacío para hacer el click, supongo que vale con ponerlo lo suficiente lejos para que salga donde salga nunca aparezca en la torre
+            showHint({
                 type: "click",
                 x: summoned.x + 200,
                 y: summoned.y
             });
-        } //de esta manera, esta mano sólo aparecerá si protagonist está seleccionado, si el jugador deseleccionase, no aparece (porque puede deseleccionar tanto para moverlo como para pulsar la interfaz o un punto inválido), de tal forma que volvería a aparecer la mano sobre the protagonist, y volvería a aparecer en el mismo punto, así hasta que el jugador mueva a the protagonist, en cuyo caso:
+        }
     }
 
-    if(tutorial.step === 3 && summoned.data.state === "moving") { //este resulta el único check para saber de verdad si se ha movido
+    if(tutorial.step === 3 && summoned.data.state === "moving") {
         hideHint();
 
         tutorial.archetypeMoved = true;
@@ -126,7 +127,7 @@ export function updateTutorialA(deltaTime) {
         if(timer > 60) {
             tutorial.AtutorialComplete = true;
             timer = 0;
-            console.log("cambio");
+            metaResources.tutorialFirstCompleted = true;
 
             startSceneTransition(() => changeToM());
         }

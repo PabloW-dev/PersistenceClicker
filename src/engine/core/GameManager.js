@@ -33,6 +33,8 @@ let mouseUpHandler = null;
 function init(canvas) {
     if (renderer && currentCanvas === canvas) return;
 
+    console.log(worldState.structures.length);
+
     currentCanvas = canvas;
 
     if (renderer && mouseUpHandler) {
@@ -77,9 +79,12 @@ function init(canvas) {
 
         const rect = renderer.canvas.getBoundingClientRect();
 
+        const scaleX = renderer.canvas.width / rect.width;
+        const scaleY = renderer.canvas.height / rect.height;
+
         const screenPos = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
         };
 
         const worldPos = camera.screenToWorld(screenPos);
